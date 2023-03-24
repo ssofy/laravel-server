@@ -1,0 +1,60 @@
+{
+    "name": "ssofy/laravel",
+    "type": "library",
+    "description": "Official SSOfy Laravel Package.",
+    "keywords": [
+        "ssofy",
+        "sso",
+        "login",
+        "auth",
+        "authentication",
+        "oauth",
+        "oauth2",
+        "laravel",
+        "package",
+        "passport",
+        "sdk"
+    ],
+    "homepage": "https://www.ssofy.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "SSOfy",
+            "email": "support@ssofy.com"
+        },
+        {
+            "name": "Cubelet Ltd.",
+            "email": "info@cubelet.co.uk"
+        }
+    ],
+    "require": {
+        "php": ">=5.6",
+        "laravel/framework": "^5.5|^6.0|^7.0|^8.0|^9.0|^10.0",
+        "illuminate/support": "^5.5|^6.0|^7.0|^8.0|^9.0|^10.0",
+        "illuminate/queue": "^5.5|^6.0|^7.0|^8.0|^9.0|^10.0",
+        "ssofy/php-sdk": "^1.0.0",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.11"
+    },
+    "autoload": {
+        "psr-4": {
+            "SSOfy\\Laravel\\": "src/"
+        },
+        "exclude-from-classmap": [
+            "scaffold/Controllers"
+        ]
+    },
+    "minimum-stability": "dev",
+    "scripts": {
+        "cs-fixer": "php-cs-fixer fix"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "SSOfy\\Laravel\\ServiceProvider"
+            ]
+        }
+    }
+}
