@@ -27,17 +27,17 @@ class UserTransformer
 
         return new UserEntity(
             array_merge($metadata, [
-                'id'                => strval($this->get($user, 'id')),
-                'hash'              => strval($this->get($user, 'hash')),
-                'name'              => $this->get($user, 'name'),
-                'display_name'      => $this->get($user, 'display_name'),
-                'picture'           => $this->get($user, 'picture'),
-                'username'          => $this->get($user, 'username'),
-                'email'             => $this->get($user, 'email'),
-                'email_verified_at' => $this->get($user, 'email_verified_at'),
-                'phone'             => $this->get($user, 'phone'),
-                'phone_verified_at' => $this->get($user, 'phone_verified_at'),
-                'additional'        => Arr::except($user->toArray(), $metadataColumn),
+                'id'             => strval($this->get($user, 'id')),
+                'hash'           => strval($this->get($user, 'hash')),
+                'name'           => $this->get($user, 'name'),
+                'display_name'   => $this->get($user, 'display_name'),
+                'picture'        => $this->get($user, 'picture'),
+                'username'       => $this->get($user, 'username'),
+                'email'          => $this->get($user, 'email'),
+                'email_verified' => !empty($this->get($user, 'email_verified_at')),
+                'phone'          => $this->get($user, 'phone'),
+                'phone_verified' => !empty($this->get($user, 'phone_verified_at')),
+                'additional'     => Arr::except($user->toArray(), $metadataColumn),
             ])
         );
     }
