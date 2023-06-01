@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.0.2 - 2023-06-01
+
+* Fixed the issue with `email_verified` and `phone_verified` claims.
+
 ## 1.0.1 - 2023-06-01
 
 * Handled `user_updated` (profile updates) and `user_added` (registration).
