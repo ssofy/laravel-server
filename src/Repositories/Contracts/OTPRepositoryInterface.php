@@ -23,7 +23,7 @@ interface OTPRepositoryInterface
      * @param OTPOptionEntity $option
      * @return string
      */
-    public function createCode($option);
+    public function newVerificationCode($option);
 
     /**
      * Expire a previously generated OTP.
@@ -32,7 +32,7 @@ interface OTPRepositoryInterface
      * @param string $code
      * @return void
      */
-    public function deleteCode($optionId, $code);
+    public function destroyVerificationCode($optionId, $code);
 
     /**
      * Get user id which was previously stored for a selected option and code.

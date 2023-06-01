@@ -28,6 +28,9 @@ class OTPRepository implements OTPRepositoryInterface
         $this->userRepository = $userRepository;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function options($userId, $action, $ip = null)
     {
         $user = $this->userRepository->findById($userId, $ip);
@@ -65,18 +68,27 @@ class OTPRepository implements OTPRepositoryInterface
         return $options;
     }
 
-    public function createCode($option)
+    /**
+     * @inheritDoc
+     */
+    public function newVerificationCode($option)
     {
         $group = "otp-{$option->id}";
-        return $this->otp->generateNumbers($option->user_id, 60 * 60, 6, $group);
+        return $this->otp->randomDigitsOTP($option->user_id, 60 * 60, 6, $group);
     }
 
-    public function deleteCode($optionId, $code)
+    /**
+     * @inheritDoc
+     */
+    public function destroyVerificationCode($optionId, $code)
     {
         $group = "otp-$optionId";
         $this->otp->forget($code, $group);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getUserId($optionId, $code)
     {
         $group = "otp-$optionId";

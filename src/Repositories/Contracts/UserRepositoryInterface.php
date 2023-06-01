@@ -55,7 +55,26 @@ interface UserRepositoryInterface
     public function findByEmailOrCreate($user, $ip = null);
 
     /**
-     * Generate and store a new token for password-less login.
+     * Create a user.
+     *
+     * @param UserEntity $user
+     * @param string|null $password
+     * @param string|null $ip
+     * @return UserEntity
+     */
+    public function create($user, $password = null, $ip = null);
+
+    /**
+     * Update a user.
+     *
+     * @param UserEntity $user
+     * @param string|null $ip
+     * @return UserEntity
+     */
+    public function update($user, $ip = null);
+
+    /**
+     * Generate and store a new token for password-less authentication.
      * Returns the generated token.
      *
      * @param string $userId
@@ -76,11 +95,11 @@ interface UserRepositoryInterface
      * Verify user's password.
      *
      * @param string $userId
-     * @param string $password
+     * @param string|null $password
      * @param string|null $ip
      * @return boolean
      */
-    public function verifyPassword($userId, $password, $ip = null);
+    public function verifyPassword($userId, $password = null, $ip = null);
 
     /**
      * Update user's password.

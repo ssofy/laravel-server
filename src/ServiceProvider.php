@@ -82,6 +82,7 @@ class ServiceProvider extends LaravelAuthServiceProvider
 
         if (!class_exists('CreateUserSocialLinksTable')) {
             $this->publishes([
+                __DIR__ . '/../database/migrations/add_missing_columns_to_users_table.php.stub' => database_path('migrations/' . date('Y_m_d_His', time()) . '_add_missing_columns_to_users_table.php'),
                 __DIR__ . '/../database/migrations/create_user_social_links_table.php.stub' => database_path('migrations/' . date('Y_m_d_His', time()) . '_create_user_social_links_table.php'),
             ], ['ssofy', 'ssofy:migrations']);
         }

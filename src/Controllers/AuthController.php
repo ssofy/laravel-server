@@ -164,7 +164,7 @@ class AuthController extends AbstractController
             return false;
         }
 
-        $otpRepository->deleteCode($optionId, $code);
+        $otpRepository->destroyVerificationCode($optionId, $code);
 
         return $user;
     }
@@ -181,9 +181,11 @@ class AuthController extends AbstractController
             return false;
         }
 
-        $ok = $userRepository->verifyPassword($user->id, $password, $ip);
-        if (!$ok) {
-            return false;
+        if (!empty($password)) {
+            $ok = $userRepository->verifyPassword($user->id, $password, $ip);
+            if (!$ok) {
+                return false;
+            }
         }
 
         return $user;

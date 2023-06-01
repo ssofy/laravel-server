@@ -4,6 +4,8 @@ namespace SSOfy\Laravel\Repositories;
 
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Hashing\BcryptHasher;
+use Illuminate\Support\Facades\Hash;
+use ReflectionClass;
 use SSOfy\Laravel\Models\UserSocialLink;
 use SSOfy\Laravel\OTP;
 use SSOfy\Laravel\Repositories\Contracts\UserRepositoryInterface;
@@ -36,6 +38,9 @@ class UserRepository implements UserRepositoryInterface
         $this->userTransformer = $userTransformer;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function findById($id, $ip = null)
     {
         $user = $this->cache(['id' => $id], function () use ($id) {
@@ -49,6 +54,9 @@ class UserRepository implements UserRepositoryInterface
         return $this->userTransformer->transform($user);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function findByToken($token, $ip = null)
     {
         $userId = $this->otp->verify($token, null, true);
@@ -60,6 +68,9 @@ class UserRepository implements UserRepositoryInterface
         return $this->findById($userId, $ip);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function findBySocialLink($provider, $user, $ip = null)
     {
         // the user entity holds the id provided by the provider
@@ -85,10 +96,13 @@ class UserRepository implements UserRepositoryInterface
         return $created;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function find($field, $value, $ip = null)
     {
         $user = $this->cache([$field => $value], function () use ($field, $value) {
-            $column = $this->getColumn($field);
+            $column = $this->getDBColumn($field);
 
             return $this->userProvider()->retrieveByCredentials([
                 $column => $value,
@@ -102,16 +116,19 @@ class UserRepository implements UserRepositoryInterface
         return $this->userTransformer->transform($user);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function findByEmailOrCreate($user, $ip = null)
     {
         $model = config('ssofy.user.model');
 
         $userModel = $model::firstOrCreate([
-            $this->getColumn('email') => $user->email,
+            $this->getDBColumn('email') => $user->email,
         ], [
-            $this->getColumn('name')     => !is_null($user->name) ? $user->name : explode('@', $user->email)[0],
-            $this->getColumn('email')    => $user->email,
-            $this->getColumn('password') => '',
+            $this->getDBColumn('name')     => !is_null($user->name) ? $user->name : explode('@', $user->email)[0],
+            $this->getDBColumn('email')    => $user->email,
+            $this->getDBColumn('password') => '',
         ]);
 
         return $this->userTransformer->transform($userModel);
@@ -120,20 +137,60 @@ class UserRepository implements UserRepositoryInterface
     /**
      * @inheritDoc
      */
+    public function create($user, $password = null, $ip = null)
+    {
+        $model = config('ssofy.user.model');
+
+        $userAttributes = $user->toArray();
+
+        if (!is_null($password)) {
+            $userAttributes['password'] = Hash::make($password);
+        }
+
+        $userModel = new $model;
+
+        return $this->storeUser($userAttributes, $userModel);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function update($user, $ip = null)
+    {
+        $model = config('ssofy.user.model');
+
+        $userAttributes = $user->toArray();
+
+        $userModel = $model::findOrFail($userAttributes['id']);
+
+        unset($userAttributes['id']);
+
+        return $this->storeUser($userAttributes, $userModel);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function createToken($userId, $ttl = 0)
     {
         return new TokenEntity([
-            'token' => $this->otp->generateRandom($userId, $ttl),
+            'token' => $this->otp->randomStringOTP($userId, $ttl),
             'ttl'   => $ttl,
         ]);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function deleteToken($token)
     {
         $this->otp->forget($token);
     }
 
-    public function verifyPassword($userId, $password, $ip = null)
+    /**
+     * @inheritDoc
+     */
+    public function verifyPassword($userId, $password = null, $ip = null)
     {
         $user = $this->cache(['id' => $userId], function () use ($userId) {
             return $this->userProvider()->retrieveById($userId);
@@ -144,10 +201,13 @@ class UserRepository implements UserRepositoryInterface
         }
 
         return $this->userProvider()->validateCredentials($user, [
-            config('ssofy.user.map.password') => $password,
+            config('ssofy.user.column.password') => $password,
         ]);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function updatePassword($userId, $password, $ip = null)
     {
         $user = $this->cache(['id' => $userId], function () use ($userId) {
@@ -161,6 +221,37 @@ class UserRepository implements UserRepositoryInterface
         ]);
 
         $user->save();
+    }
+
+    protected function storeUser($userAttributes, $userModel)
+    {
+        foreach ($userAttributes as $attribute => $value) {
+            $dbColumn = $this->getDBColumn($attribute);
+            if (empty($dbColumn)) {
+                continue;
+            }
+
+            $userModel->$dbColumn = $value;
+        }
+
+        $metadataColumn = $this->getDBColumn('metadata');
+
+        if (!empty($metadataColumn)) {
+            if (isset($userAttributes['password'])) {
+                unset($userAttributes['password']);
+            }
+
+            $userModelCasts = $this->getModelCasts($userModel);
+            if (isset($userModelCasts) && $userModelCasts === 'array') {
+                $userModel->$metadataColumn = $userAttributes;
+            } else {
+                $userModel->$metadataColumn = json_encode($userAttributes, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            }
+        }
+
+        $userModel->save();
+
+        return $this->userTransformer->transform($userModel);
     }
 
     /**
@@ -189,7 +280,7 @@ class UserRepository implements UserRepositoryInterface
         }
 
         foreach (['id', 'email', 'phone'] as $field) {
-            $column = $this->getColumn($field);
+            $column = $this->getDBColumn($field);
             if (isset($user->$column)) {
                 $this->index["$field:{$user->$column}"] = $user;
             }
@@ -198,8 +289,16 @@ class UserRepository implements UserRepositoryInterface
         return $user;
     }
 
-    protected function getColumn($method)
+    protected function getDBColumn($column)
     {
-        return config("ssofy.user.map.$method");
+        return config("ssofy.user.column.$column");
+    }
+
+    protected function getModelCasts($model)
+    {
+        $reflection    = new ReflectionClass($model);
+        $castsProperty = $reflection->getProperty('casts');
+        $castsProperty->setAccessible(true);
+        return $castsProperty->getValue($model);
     }
 }

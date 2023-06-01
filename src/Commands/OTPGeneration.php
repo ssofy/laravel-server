@@ -37,9 +37,9 @@ class OTPGeneration extends Command
         $len = $len <= 0 ? 32 : $len;
 
         if ('numbers' === $type) {
-            $token = $this->otp->generateNumbers($this->argument('user'), $ttl, $len);
+            $token = $this->otp->randomDigitsOTP($this->argument('user'), $ttl, $len);
         } else {
-            $token = $this->otp->generateRandom($this->argument('user'), $ttl, $len);
+            $token = $this->otp->randomStringOTP($this->argument('user'), $ttl, $len);
         }
 
         $this->table([], [

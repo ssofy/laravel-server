@@ -3,7 +3,9 @@
 namespace SSOfy\Laravel\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Notification;
+use SSOfy\Exceptions\RequiredAttributeException;
 use SSOfy\Laravel\Notifications\OTPNotification;
 use SSOfy\Laravel\Repositories\Contracts\APIRepositoryInterface;
 use SSOfy\Laravel\Repositories\Contracts\OTPRepositoryInterface;
@@ -11,6 +13,7 @@ use SSOfy\Laravel\Repositories\Contracts\UserRepositoryInterface;
 use SSOfy\Laravel\Rules\OTPVerification;
 use SSOfy\Laravel\Traits\Validation;
 use SSOfy\Models\Entities\OTPOptionEntity;
+use SSOfy\Models\Entities\UserEntity;
 
 class EventController extends AbstractController
 {
@@ -97,6 +100,45 @@ class EventController extends AbstractController
 
                 $this->passwordReset($payload, $userRepository);
                 break;
+
+            case 'user_added':
+                /*
+                 * Payload validation
+                 */
+                $validatorFactory = app('Illuminate\Validation\Factory');
+                if ($validatorFactory->make($payload, [
+                    'ip' => ['bail', 'nullable', 'ip'],
+                ])->failed()) {
+                    abort(400, 'Bad Request');
+                }
+                //
+
+                try {
+                    $this->userAdded($payload, $userRepository);
+                } catch (\SSOfy\Exceptions\Exception $exception) {
+                    abort(400, 'Bad Request');
+                }
+                break;
+
+            case 'user_updated':
+                /*
+                 * Payload validation
+                 */
+                $validatorFactory = app('Illuminate\Validation\Factory');
+                if ($validatorFactory->make($payload, [
+                    'id' => ['bail', 'required', 'string'],
+                    'ip' => ['bail', 'nullable', 'ip'],
+                ])->failed()) {
+                    abort(400, 'Bad Request');
+                }
+                //
+
+                try {
+                    $this->userUpdated($payload, $userRepository);
+                } catch (\SSOfy\Exceptions\Exception $exception) {
+                    abort(400, 'Bad Request');
+                }
+                break;
         }
 
         return [
@@ -141,7 +183,7 @@ class EventController extends AbstractController
     {
         $option = new OTPOptionEntity($payload['option']);
 
-        $code = $otpRepository->createCode($option);
+        $code = $otpRepository->newVerificationCode($option);
 
         /*
          * Send notification
@@ -156,6 +198,43 @@ class EventController extends AbstractController
     }
 
     /**
+     * User Added event handler.
+     *
+     * @param array $payload
+     * @param UserRepositoryInterface $userRepository
+     * @return void
+     */
+    public function userAdded($payload, UserRepositoryInterface $userRepository)
+    {
+        $payload['id'] = '0';
+        $payload['hash'] = '0';
+
+        /** @var UserEntity $user */
+        $user = UserEntity::make($payload);
+
+        $userRepository->create($user, Arr::get($payload, 'password'), Arr::get($payload, 'ip'));
+    }
+
+    /**
+     * User Updated event handler.
+     *
+     * @param array $payload
+     * @param UserRepositoryInterface $userRepository
+     * @return void
+     */
+    public function userUpdated($payload, UserRepositoryInterface $userRepository)
+    {
+        if (isset($payload['id'])) {
+            $payload['hash'] = $payload['id'];
+        }
+
+        /** @var UserEntity $user */
+        $user = UserEntity::make($payload);
+
+        $userRepository->update($user, Arr::get($payload, 'ip'));
+    }
+
+    /**
      * Password Reset event handler.
      *
      * @param array $payload
@@ -164,12 +243,12 @@ class EventController extends AbstractController
      */
     public function passwordReset($payload, UserRepositoryInterface $userRepository)
     {
-        $user = $userRepository->findByToken($payload['token'], $payload['ip']);
+        $user = $userRepository->findByToken($payload['token'], Arr::get($payload, 'ip'));
         if (is_null($user)) {
             abort(401, 'Unauthorized');
         }
 
-        $userRepository->updatePassword($user->id, $payload['password'], $payload['ip']);
+        $userRepository->updatePassword($user->id, $payload['password'], Arr::get($payload, 'ip'));
 
         $userRepository->deleteToken($payload['token']);
     }

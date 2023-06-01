@@ -7,6 +7,9 @@ use SSOfy\Models\Entities\ScopeEntity;
 
 class ScopeRepository implements ScopeRepositoryInterface
 {
+    /**
+     * @inheritDoc
+     */
     public function findAll($lang)
     {
         $result = [];

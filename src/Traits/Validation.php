@@ -14,7 +14,17 @@ trait Validation
      */
     protected function validatePasswordAuthRequest(Request $request)
     {
-        return $request->validate($this->passwordAuthRules(), $request->input());
+        $validated = $request->validate($this->passwordAuthRules(), $request->input());
+
+        if (!config('ssofy.authentication.' . $validated['method'], false)) {
+            abort(401, 'Unauthorized');
+        }
+
+        if (empty($validated['password']) && !config('ssofy.authentication.passwordless', false)) {
+            abort(401, 'Unauthorized');
+        }
+
+        return $validated;
     }
 
     /**

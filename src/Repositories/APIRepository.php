@@ -17,11 +17,17 @@ class APIRepository implements APIRepositoryInterface
         $this->context = $context;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function deleteToken($token)
     {
         $this->context->client()->invalidateTokenCache($token);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function deleteAllTokens()
     {
         $this->context->client()->purgeTokenCache();

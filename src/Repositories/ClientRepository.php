@@ -7,6 +7,9 @@ use SSOfy\Models\Entities\ClientEntity;
 
 class ClientRepository implements ClientRepositoryInterface
 {
+    /**
+     * @inheritDoc
+     */
     public function findById($id)
     {
         $data = config('ssofy.data.clients');
