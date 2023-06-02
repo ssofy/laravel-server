@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.0.3 - 2023-06-02
+
+* Improved user search functionality using login, email, and phone.
+
 ## 1.0.2 - 2023-06-01
 
 * Fixed the issue with `email_verified` and `phone_verified` claims.
