@@ -93,7 +93,10 @@ trait Rules
     public function userEntityRules()
     {
         return [
-            'id'       => ['required', 'string', 'min:1'],
+            'id'       => ['nullable', 'string'],
+            'username' => ['nullable', 'string'],
+            'email'    => ['nullable', 'string'],
+            'phone'    => ['nullable', 'string'],
             'scopes'   => ['nullable', 'array'],
             'scopes.*' => ['string'],
         ];

@@ -64,18 +64,31 @@ class OAuthServerController extends AbstractController
     {
         $this->validateUserEntityRequest($request);
 
-        $userId = $request->input('id');
         $scopes = $request->input('scopes');
 
-        $user = $userRepository->findById($userId);
+        foreach ([
+            'id',
+            'username',
+            'email',
+            'phone',
+        ] as $field) {
+            if ($request->has($field)) {
+                $user = $userRepository->find(
+                    config('ssofy.user.column.' . $field),
+                    $request->input($field)
+                );
 
-        if (is_null($user)) {
-            abort(204, 'Not Found');
+                if (is_null($user)) {
+                    abort(204, 'Not Found');
+                }
+
+                /** @var UserFilterInterface $filter */
+                $filter = app(config('ssofy.user.filter'));
+
+                return $filter->filter($user, $scopes);
+            }
         }
 
-        /** @var UserFilterInterface $filter */
-        $filter = app(config('ssofy.user.filter'));
-
-        return $filter->filter($user, $scopes);
+        abort(204, "Not Found");
     }
 }
