@@ -48,11 +48,9 @@ class EventController extends AbstractController
                  * Payload validation
                  */
                 $validatorFactory = app('Illuminate\Validation\Factory');
-                if ($validatorFactory->make($payload, [
+                $validatorFactory->make($payload, [
                     'token' => ['bail', 'required', 'string', 'min:1'],
-                ])->failed()) {
-                    abort(400, 'Bad Request');
-                }
+                ])->validate();
                 //
 
                 $this->tokenDeleted($payload, $apiRepository);
@@ -67,7 +65,7 @@ class EventController extends AbstractController
                  * Payload validation
                  */
                 $validatorFactory = app('Illuminate\Validation\Factory');
-                if ($validatorFactory->make($payload, [
+                $validatorFactory->make($payload, [
                     'option'         => ['bail', 'required', 'array'],
                     'option.id'      => ['bail', 'required', 'string'],
                     'option.type'    => ['bail', 'required', 'string'],
@@ -76,9 +74,7 @@ class EventController extends AbstractController
                     'option.user_id' => ['bail', 'required', 'string'],
                     'option.action'  => ['bail', 'required', 'string'],
                     'ip'             => ['bail', 'nullable', 'string'],
-                ])->failed()) {
-                    abort(400, 'Bad Request');
-                }
+                ])->validate();
                 //
 
                 $this->sendOTP($payload, $otpRepository);
@@ -89,13 +85,11 @@ class EventController extends AbstractController
                  * Payload validation
                  */
                 $validatorFactory = app('Illuminate\Validation\Factory');
-                if ($validatorFactory->make($payload, [
+                $validatorFactory->make($payload, [
                     'token'    => ['bail', 'required', 'string', 'min:1', OTPVerification::make()],
                     'password' => ['bail', 'required', 'string', 'min:1'],
                     'ip'       => ['bail', 'nullable', 'ip'],
-                ])->failed()) {
-                    abort(400, 'Bad Request');
-                }
+                ])->validate();
                 //
 
                 $this->passwordReset($payload, $userRepository);
@@ -106,11 +100,10 @@ class EventController extends AbstractController
                  * Payload validation
                  */
                 $validatorFactory = app('Illuminate\Validation\Factory');
-                if ($validatorFactory->make($payload, [
-                    'ip' => ['bail', 'nullable', 'ip'],
-                ])->failed()) {
-                    abort(400, 'Bad Request');
-                }
+                $validatorFactory->make($payload, [
+                    'ip'   => ['bail', 'nullable', 'ip'],
+                    'user' => ['bail', 'required', 'array'],
+                ])->validate();
                 //
 
                 try {
@@ -125,12 +118,11 @@ class EventController extends AbstractController
                  * Payload validation
                  */
                 $validatorFactory = app('Illuminate\Validation\Factory');
-                if ($validatorFactory->make($payload, [
-                    'id' => ['bail', 'required', 'string'],
-                    'ip' => ['bail', 'nullable', 'ip'],
-                ])->failed()) {
-                    abort(400, 'Bad Request');
-                }
+                $validatorFactory->make($payload, [
+                    'user'    => ['bail', 'required', 'array'],
+                    'user.id' => ['bail', 'required', 'string'],
+                    'ip'      => ['bail', 'nullable', 'ip'],
+                ])->validate();
                 //
 
                 try {
@@ -206,13 +198,13 @@ class EventController extends AbstractController
      */
     public function userAdded($payload, UserRepositoryInterface $userRepository)
     {
-        $payload['id'] = '0';
-        $payload['hash'] = '0';
+        $payload['user']['id'] = '0';
+        $payload['user']['hash'] = '0';
 
         /** @var UserEntity $user */
-        $user = UserEntity::make($payload);
+        $user = UserEntity::make($payload['user']);
 
-        $userRepository->create($user, Arr::get($payload, 'password'), Arr::get($payload, 'ip'));
+        $userRepository->create($user, Arr::get($payload['user'], 'password'), Arr::get($payload, 'ip'));
     }
 
     /**
@@ -224,12 +216,10 @@ class EventController extends AbstractController
      */
     public function userUpdated($payload, UserRepositoryInterface $userRepository)
     {
-        if (isset($payload['id'])) {
-            $payload['hash'] = $payload['id'];
-        }
+        $payload['user']['hash'] = $payload['user']['id'];
 
         /** @var UserEntity $user */
-        $user = UserEntity::make($payload);
+        $user = UserEntity::make($payload['user']);
 
         $userRepository->update($user, Arr::get($payload, 'ip'));
     }

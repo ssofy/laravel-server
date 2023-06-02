@@ -4,6 +4,7 @@ namespace SSOfy\Laravel\Repositories;
 
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Hashing\BcryptHasher;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use ReflectionClass;
 use SSOfy\Laravel\Models\UserSocialLink;
@@ -225,6 +226,10 @@ class UserRepository implements UserRepositoryInterface
 
     protected function storeUser($userAttributes, $userModel)
     {
+        if (!isset($userAttributes['name']) && !empty($this->getDBColumn('name'))) {
+            $userAttributes['name'] = trim(Arr::get($userAttributes, 'given_name', '') . ' ' . Arr::get($userAttributes, 'family_name', ''));
+        }
+
         foreach ($userAttributes as $attribute => $value) {
             $dbColumn = $this->getDBColumn($attribute);
             if (empty($dbColumn)) {
