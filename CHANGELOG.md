@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.0.4 - 2023-06-02
+
+* Fixed the issue with event payload validation.
+* Fixed the issue with `user_add` and `user_update`.
+* Fixed the issue with empty `name` attribute.
+
 ## 1.0.3 - 2023-06-02
 
 * Improved user search functionality using login, email, and phone.
