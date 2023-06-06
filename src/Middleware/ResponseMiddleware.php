@@ -67,7 +67,7 @@ class ResponseMiddleware
         return $response
             ->setContent(json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
             ->withHeaders([
-                'Signature' => base64_encode(json_encode($signatureGenerator->generate($path, $body, $this->context->defaultClientConfig()->getSecret(), $salt)->toArray())),
+                'Signature' => base64_encode(json_encode($signatureGenerator->generate($path, $body, $this->context->defaultAPIConfig()->getSecret(), $salt)->toArray())),
             ]);
     }
 

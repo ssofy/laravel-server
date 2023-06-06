@@ -4,12 +4,12 @@ namespace SSOfy\Laravel\Rules;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Validation\Rule;
-use SSOfy\Laravel\OTP;
+use SSOfy\Laravel\UserTokenManager;
 
 class OTPVerification implements Rule
 {
     /**
-     * @var OTP
+     * @var UserTokenManager
      */
     private $otp;
 
@@ -23,7 +23,7 @@ class OTPVerification implements Rule
      */
     private $forget;
 
-    public function __construct(OTP $otp, $group = null, $forget = false)
+    public function __construct(UserTokenManager $otp, $group = null, $forget = false)
     {
         $this->otp    = $otp;
         $this->group  = $group;

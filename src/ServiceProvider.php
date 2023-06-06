@@ -3,9 +3,9 @@
 namespace SSOfy\Laravel;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as LaravelAuthServiceProvider;
-use SSOfy\Laravel\Commands\OTPDelete;
-use SSOfy\Laravel\Commands\OTPGeneration;
-use SSOfy\Laravel\Commands\OTPVerification;
+use SSOfy\Laravel\Commands\UserTokenDelete;
+use SSOfy\Laravel\Commands\UserTokenGeneration;
+use SSOfy\Laravel\Commands\UserTokenVerification;
 use SSOfy\Laravel\Middleware\SSOMiddleware;
 use SSOfy\Laravel\Middleware\ResponseMiddleware;
 use SSOfy\Laravel\Middleware\SignatureValidationMiddleware;
@@ -53,9 +53,9 @@ class ServiceProvider extends LaravelAuthServiceProvider
         }
 
         $this->commands([
-            OTPGeneration::class,
-            OTPVerification::class,
-            OTPDelete::class,
+            UserTokenGeneration::class,
+            UserTokenVerification::class,
+            UserTokenDelete::class,
         ]);
     }
 
@@ -67,7 +67,8 @@ class ServiceProvider extends LaravelAuthServiceProvider
 
         // config
         $this->publishes([
-            __DIR__ . '/../config/ssofy.php' => config_path('ssofy.php'),
+            __DIR__ . '/../config/ssofy.php'      => config_path('ssofy.php'),
+            __DIR__ . '/../config/sso-client.php' => config_path('sso-client.php'),
         ], ['ssofy', 'ssofy:config']);
 
         // routes

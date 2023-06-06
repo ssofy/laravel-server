@@ -8,7 +8,7 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
-use SSOfy\Client;
+use SSOfy\APIClient;
 use SSOfy\Exceptions\APIException;
 use SSOfy\Exceptions\InvalidTokenException;
 use SSOfy\Exceptions\SignatureVerificationException;
@@ -41,7 +41,7 @@ class ServiceGuard implements Guard
     protected $context;
 
     /**
-     * @var Client
+     * @var APIClient
      */
     protected $client;
 
@@ -61,9 +61,9 @@ class ServiceGuard implements Guard
         $this->request  = $request;
         $this->context  = $context;
 
-        $this->client = new Client($context->defaultClientConfig());
+        $this->client = new APIClient($context->defaultAPIConfig());
 
-        $this->oauth2Client = $context->oauth2();
+        $this->oauth2Client = $context->ssoClient();
     }
 
     public function check()
@@ -153,6 +153,10 @@ class ServiceGuard implements Guard
             $accessToken = $this->oauth2Client->getAccessToken($state);
         } else {
             $accessToken = $this->request->header('Authorization');
+        }
+
+        if (empty($accessToken)) {
+            return null;
         }
 
         try {

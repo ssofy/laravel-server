@@ -37,7 +37,7 @@ class SSOMiddleware
     {
         $authorized = false;
 
-        $oauth2Client = $this->context->oauth2();
+        $oauth2Client = $this->context->ssoClient();
 
         if ($request->acceptsHtml()) {
             $state = $oauth2Client->getSessionState();
@@ -81,7 +81,7 @@ class SSOMiddleware
         }
 
         if ($request->acceptsHtml()) {
-            return $this->context->oauth2()->initAuthCodeFlow($request->getRequestUri());
+            return $this->context->ssoClient()->initAuthCodeFlow($request->getRequestUri());
         }
 
         return null;

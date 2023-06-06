@@ -54,8 +54,23 @@ class OAuthClientController extends AbstractController
         /*
          * Redirection
          */
-        $url = $this->context->oauth2()->continueAuthCodeFlow($state, $code);
+        $url = $this->context->ssoClient()->continueAuthCodeFlow($state, $code);
 
         return redirect($url);
+    }
+
+    public function logout(Request $request)
+    {
+        $redirectUri = $request->input('redirect_uri', null);
+        $everywhere  = boolval($request->input('everywhere', false));
+
+        return redirect($this->context->ssoClient()->getLogoutUrl($redirectUri, $everywhere));
+    }
+
+    public function socialAuth(Request $request, $provider)
+    {
+        $redirectUri = $request->input('redirect_uri', url()->to('/'));
+
+        return redirect($this->context->ssoClient()->initSocialAuthCodeFlow($redirectUri, $provider));
     }
 }

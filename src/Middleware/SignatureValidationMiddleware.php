@@ -35,7 +35,7 @@ class SignatureValidationMiddleware
         $path   = '/' . ltrim($request->path(), '/');
         $params = $request->input();
 
-        $validator = new SignatureValidator($this->context->defaultClientConfig());
+        $validator = new SignatureValidator($this->context->defaultAPIConfig());
 
         if (false === $validator->verifyBase64Signature($path, $params, $signature)) {
             return response('', 400);

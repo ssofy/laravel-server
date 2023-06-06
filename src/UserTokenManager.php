@@ -5,7 +5,7 @@ namespace SSOfy\Laravel;
 use Illuminate\Support\Str;
 use SSOfy\Storage\StorageInterface;
 
-class OTP
+class UserTokenManager
 {
     /**
      * @var StorageInterface
@@ -22,7 +22,7 @@ class OTP
      * @param int $ttl time-to-live in seconds
      * @return string
      */
-    public function randomStringOTP($userId, $ttl = 60, $length = 32, $group = null)
+    public function randomStringToken($userId, $ttl = 60, $length = 32, $group = null)
     {
         $token = Str::random($length);
 
@@ -36,7 +36,7 @@ class OTP
      * @param int $ttl time-to-live in seconds
      * @return string
      */
-    public function randomDigitsOTP($userId, $ttl = 60, $digits = 6, $group = null)
+    public function randomDigitsToken($userId, $ttl = 60, $digits = 6, $group = null)
     {
         $token = '';
 

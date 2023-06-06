@@ -35,11 +35,15 @@ trait Rules
     protected function socialAuthRules()
     {
         return [
-            'provider'   => ['required', 'string'],
-            'user.id'    => ['required', 'string', 'min:1'],
-            'user.email' => ['required', 'email'],
-            'user.name'  => ['nullable', 'string'],
-            'ip'         => ['nullable', 'ip'],
+            'provider'            => ['required', 'string'],
+            'user.id'             => ['required', 'string', 'min:1'],
+            'user.email'          => ['required', 'email'],
+            'user.email_verified' => ['nullable', 'boolean'],
+            'user.name'           => ['nullable', 'string'],
+            'user.given_name'     => ['nullable', 'string'],
+            'user.family_name'    => ['nullable', 'string'],
+            'user.picture'        => ['nullable', 'url'],
+            'ip'                  => ['nullable', 'ip'],
         ];
     }
 

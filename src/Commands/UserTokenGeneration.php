@@ -3,24 +3,24 @@
 namespace SSOfy\Laravel\Commands;
 
 use Illuminate\Console\Command;
-use SSOfy\Laravel\OTP;
+use SSOfy\Laravel\UserTokenManager;
 
-class OTPGeneration extends Command
+class UserTokenGeneration extends Command
 {
-    protected $signature = 'ssofy:otp-gen {user}';
+    protected $signature = 'ssofy:token-gen {user}';
 
-    protected $description = 'Generate OTP Token';
+    protected $description = 'Generate User Token';
 
     /**
-     * @var OTP
+     * @var UserTokenManager
      */
-    private $otp;
+    private $userTokenManager;
 
-    public function __construct(OTP $otp)
+    public function __construct(UserTokenManager $userTokenManager)
     {
         parent::__construct();
 
-        $this->otp = $otp;
+        $this->userTokenManager = $userTokenManager;
     }
 
     public function handle()
@@ -37,9 +37,9 @@ class OTPGeneration extends Command
         $len = $len <= 0 ? 32 : $len;
 
         if ('numbers' === $type) {
-            $token = $this->otp->randomDigitsOTP($this->argument('user'), $ttl, $len);
+            $token = $this->userTokenManager->randomDigitsToken($this->argument('user'), $ttl, $len);
         } else {
-            $token = $this->otp->randomStringOTP($this->argument('user'), $ttl, $len);
+            $token = $this->userTokenManager->randomStringToken($this->argument('user'), $ttl, $len);
         }
 
         $this->table([], [

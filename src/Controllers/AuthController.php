@@ -100,10 +100,18 @@ class AuthController extends AbstractController
      */
     public function socialAuth(Request $request, UserRepositoryInterface $userRepository)
     {
+        // validations
         $validated = $this->validateSocialAuthRequest($request);
 
+        try {
+            $validated['user']['hash'] = '0';
+            $user = new UserEntity($validated['user']);
+        } catch (\SSOfy\Exceptions\Exception $exception) {
+            abort(400, 'Bad Request');
+        }
+        //
+
         $provider = $request->input('provider');
-        $user     = new UserEntity($validated['user']);
         $ip       = $request->input('ip');
 
         $user = $userRepository->findBySocialLink($provider, $user, $ip);

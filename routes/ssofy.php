@@ -16,7 +16,6 @@ $router->group([
     'prefix'     => '/external/ssofy/',
     'middleware' => ['ssofy.signature', 'ssofy.response']
 ], function () use ($router) {
-
     $router->post('client', 'OAuthServerController@client');
 
     $router->post('scopes', 'OAuthServerController@scopes');
@@ -30,14 +29,19 @@ $router->group([
     $router->post('auth/social', 'AuthController@socialAuth');
 
     $router->post('event', 'EventController@handle');
-
 });
 
 /*
 |--------------------------------------------------------------------------
-| OAuth2 Callback Handler
+| OAuth2Client Routes
 |--------------------------------------------------------------------------
 */
-$router->get('/auth/callback', [
-    'uses' => 'SSOfy\Laravel\Controllers\OAuthClientController@handleRedirectBack',
-])->middleware('web');
+$router->group([
+    'namespace'  => 'SSOfy\Laravel\Controllers',
+    'prefix'     => '/sso/',
+    'middleware' => ['web']
+], function () use ($router) {
+    $router->get('/callback', 'OAuthClientController@handleRedirectBack');
+    $router->get('/logout', 'OAuthClientController@logout');
+    $router->get('/social/{provider}', 'OAuthClientController@socialAuth');
+});

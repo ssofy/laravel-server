@@ -22,7 +22,7 @@ class APIRepository implements APIRepositoryInterface
      */
     public function deleteToken($token)
     {
-        $this->context->client()->invalidateTokenCache($token);
+        $this->context->apiClient()->invalidateTokenCache($token);
     }
 
     /**
@@ -30,6 +30,6 @@ class APIRepository implements APIRepositoryInterface
      */
     public function deleteAllTokens()
     {
-        $this->context->client()->purgeTokenCache();
+        $this->context->apiClient()->purgeTokenCache();
     }
 }

@@ -2,7 +2,7 @@
 
 namespace SSOfy\Laravel\Repositories;
 
-use SSOfy\Laravel\OTP;
+use SSOfy\Laravel\UserTokenManager;
 use SSOfy\Laravel\Repositories\Contracts\OTPRepositoryInterface;
 use SSOfy\Laravel\Repositories\Contracts\UserRepositoryInterface;
 use SSOfy\Laravel\Traits\Mask;
@@ -13,7 +13,7 @@ class OTPRepository implements OTPRepositoryInterface
     use Mask;
 
     /**
-     * @var OTP
+     * @var UserTokenManager
      */
     private $otp;
 
@@ -22,7 +22,7 @@ class OTPRepository implements OTPRepositoryInterface
      */
     private $userRepository;
 
-    public function __construct(OTP $otp, UserRepositoryInterface $userRepository)
+    public function __construct(UserTokenManager $otp, UserRepositoryInterface $userRepository)
     {
         $this->otp            = $otp;
         $this->userRepository = $userRepository;
@@ -74,7 +74,7 @@ class OTPRepository implements OTPRepositoryInterface
     public function newVerificationCode($option)
     {
         $group = "otp-{$option->id}";
-        return $this->otp->randomDigitsOTP($option->user_id, 60 * 60, 6, $group);
+        return $this->otp->randomDigitsToken($option->user_id, 60 * 60, 6, $group);
     }
 
     /**

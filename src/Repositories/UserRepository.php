@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use ReflectionClass;
 use SSOfy\Laravel\Models\UserSocialLink;
-use SSOfy\Laravel\OTP;
+use SSOfy\Laravel\UserTokenManager;
 use SSOfy\Laravel\Repositories\Contracts\UserRepositoryInterface;
 use SSOfy\Laravel\Traits\Guard;
 use SSOfy\Laravel\Transformers\UserTransformer;
@@ -19,7 +19,7 @@ class UserRepository implements UserRepositoryInterface
     use Guard;
 
     /**
-     * @var OTP
+     * @var UserTokenManager
      */
     private $otp;
 
@@ -33,7 +33,7 @@ class UserRepository implements UserRepositoryInterface
      */
     private $index = [];
 
-    public function __construct(OTP $otp, UserTransformer $userTransformer)
+    public function __construct(UserTokenManager $otp, UserTransformer $userTransformer)
     {
         $this->otp             = $otp;
         $this->userTransformer = $userTransformer;
@@ -122,17 +122,16 @@ class UserRepository implements UserRepositoryInterface
      */
     public function findByEmailOrCreate($user, $ip = null)
     {
-        $model = config('ssofy.user.model');
+        $existingUser = $this->find('email', $user->email, $ip);
+        if (!is_null($existingUser)) {
+            return $existingUser;
+        }
 
-        $userModel = $model::firstOrCreate([
-            $this->getDBColumn('email') => $user->email,
-        ], [
-            $this->getDBColumn('name')     => !is_null($user->name) ? $user->name : explode('@', $user->email)[0],
-            $this->getDBColumn('email')    => $user->email,
-            $this->getDBColumn('password') => '',
-        ]);
+        if (empty($user->name)) {
+            $user->name = explode('@', $user->email)[0];
+        }
 
-        return $this->userTransformer->transform($userModel);
+        return $this->create($user, null, $ip);
     }
 
     /**
@@ -175,7 +174,7 @@ class UserRepository implements UserRepositoryInterface
     public function createToken($userId, $ttl = 0)
     {
         return new TokenEntity([
-            'token' => $this->otp->randomStringOTP($userId, $ttl),
+            'token' => $this->otp->randomStringToken($userId, $ttl),
             'ttl'   => $ttl,
         ]);
     }

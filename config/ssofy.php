@@ -31,6 +31,30 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | OTP Settings
+    |--------------------------------------------------------------------------
+    |
+    | Set up a cache driver to be used for temporary token storage, including
+    | Action, OTP, and Auth tokens.
+    |
+    | Also, specify the Email and SMS channels to use when the user requests a
+    | new OTP.
+    |
+    */
+    'otp'            => [
+        'store'        => env('SSOFY_OTP_CACHE_DRIVER', 'file'),
+        'notification' => [
+            'brand' => env('APP_NAME'),
+
+            'email_channel' => env('SSOFY_OTP_EMAIL_CHANNEL', 'mail'),
+
+            // 'nexmo' in older laravel versions
+            'sms_chanel'    => env('SSOFY_OTP_SMS_CHANNEL', 'vonage'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Authentication Settings
     |--------------------------------------------------------------------------
     |
@@ -95,23 +119,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | OTP Settings
-    |--------------------------------------------------------------------------
-    */
-    'otp'            => [
-        'store'        => env('SSOFY_OTP_CACHE_DRIVER', 'file'),
-        'notification' => [
-            'brand' => env('APP_NAME'),
-
-            'email_channel' => env('SSOFY_OTP_EMAIL_CHANNEL', 'mail'),
-
-            // 'nexmo' in older laravel versions
-            'sms_chanel'    => env('SSOFY_OTP_SMS_CHANNEL', 'vonage'),
-        ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Fixed Data
     |--------------------------------------------------------------------------
     |
@@ -145,26 +152,6 @@ return [
                 'privacy_policy' => 'https://...',
                 'confidential'   => false, // https://oauth.net/2/client-types
             ]
-        ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | OAuth2 Client Configurations
-    |--------------------------------------------------------------------------
-    */
-    'oauth2-client'  => [
-        'client_id'         => env('OAUTH2_CLIENT_ID'),
-        'client_secret'     => env('OAUTH2_CLIENT_SECRET'),
-        'server_url'        => env('OAUTH2_SERVER_URL'),
-        'redirect_uri'      => '/auth/callback',
-        'scopes'            => ['*'],
-        'timeout'           => 3600, // wait-for-login timeout in seconds
-        'pkce_method'       => 'S256', // options: plain, S256
-        'pkce_verification' => true,
-        'state'             => [
-            'store' => env('OAUTH2_STATE_CACHE_DRIVER', 'file'),
-            'ttl'   => env('OAUTH2_STATE_CACHE_TTL', 31536000), // time-to-live in seconds (default: 1-year)
         ],
     ],
 ];

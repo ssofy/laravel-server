@@ -3,7 +3,7 @@
 namespace SSOfy\Laravel;
 
 use Illuminate\Contracts\Auth\UserProvider as LaravelUserProvider;
-use SSOfy\Client;
+use SSOfy\APIClient;
 use SSOfy\Exceptions\InvalidTokenException;
 
 class UserProvider implements LaravelUserProvider
@@ -14,7 +14,7 @@ class UserProvider implements LaravelUserProvider
     protected $cache;
 
     /**
-     * @var Client
+     * @var APIClient
      */
     protected $client;
 
@@ -26,7 +26,7 @@ class UserProvider implements LaravelUserProvider
             $this->cache = true;
         }
 
-        $this->client = new Client($context->defaultClientConfig());
+        $this->client = new APIClient($context->defaultAPIConfig());
     }
 
     public function retrieveById($identifier)
