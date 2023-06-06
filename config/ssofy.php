@@ -66,6 +66,7 @@ return [
         'email'        => true,
         'phone'        => true,
         'token'        => true,
+        'otp'          => true,
         'passwordless' => true,
     ],
 
