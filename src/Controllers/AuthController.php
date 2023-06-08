@@ -114,7 +114,7 @@ class AuthController extends AbstractController
         $provider = $request->input('provider');
         $ip       = $request->input('ip');
 
-        $user = $userRepository->findBySocialLink($provider, $user, $ip);
+        $user = $userRepository->findBySocialLinkOrCreate($provider, $user, $ip);
         if (is_null($user)) {
             abort(409, 'Duplicate');
         }

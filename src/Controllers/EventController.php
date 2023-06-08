@@ -5,7 +5,6 @@ namespace SSOfy\Laravel\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Notification;
-use SSOfy\Exceptions\RequiredAttributeException;
 use SSOfy\Laravel\Notifications\OTPNotification;
 use SSOfy\Laravel\Repositories\Contracts\APIRepositoryInterface;
 use SSOfy\Laravel\Repositories\Contracts\OTPRepositoryInterface;

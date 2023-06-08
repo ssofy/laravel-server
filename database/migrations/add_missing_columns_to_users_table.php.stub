@@ -30,7 +30,11 @@ class AddMissingColumnsToUsersTable extends Migration
             }
 
             if (!Schema::hasColumn('users', 'metadata')) {
-                $table->json('metadata')->after('id')->nullable()->after('phone_verified_at');
+                $table->json('metadata')->nullable()->after('phone_verified_at');
+            }
+
+            if (!Schema::hasColumn('users', 'avatar_url')) {
+                $table->string('avatar_url')->nullable()->after('metadata');
             }
         });
     }

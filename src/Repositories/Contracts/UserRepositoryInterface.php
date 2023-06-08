@@ -33,7 +33,7 @@ interface UserRepositoryInterface
      * @param string|null $ip
      * @return UserEntity|null
      */
-    public function findBySocialLink($provider, $user, $ip = null);
+    public function findBySocialLinkOrCreate($provider, $user, $ip = null);
 
     /**
      * Find user by credentials such as email, phone, etc.
@@ -49,10 +49,11 @@ interface UserRepositoryInterface
      * Find or create user by email.
      *
      * @param UserEntity $user
+     * @param string|null $password
      * @param string|null $ip
      * @return UserEntity|null
      */
-    public function findByEmailOrCreate($user, $ip = null);
+    public function findByEmailOrCreate($user, $password = null, $ip = null);
 
     /**
      * Create a user.

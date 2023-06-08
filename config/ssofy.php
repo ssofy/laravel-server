@@ -66,6 +66,7 @@ return [
         'email'        => true,
         'phone'        => true,
         'token'        => true,
+        'otp'          => true,
         'passwordless' => true,
     ],
 
@@ -106,7 +107,7 @@ return [
             'hash'              => 'id',
             'name'              => 'name',
             'display_name'      => 'name',
-            'picture'           => null,
+            'picture'           => 'avatar_url',
             'username'          => 'username',
             'email'             => 'email',
             'email_verified_at' => 'email_verified_at',

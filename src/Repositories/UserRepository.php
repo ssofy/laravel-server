@@ -7,6 +7,7 @@ use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use ReflectionClass;
+use SSOfy\Helper;
 use SSOfy\Laravel\Models\UserSocialLink;
 use SSOfy\Laravel\UserTokenManager;
 use SSOfy\Laravel\Repositories\Contracts\UserRepositoryInterface;
@@ -72,7 +73,7 @@ class UserRepository implements UserRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function findBySocialLink($provider, $user, $ip = null)
+    public function findBySocialLinkOrCreate($provider, $user, $ip = null)
     {
         // the user entity holds the id provided by the provider
 
@@ -86,7 +87,7 @@ class UserRepository implements UserRepositoryInterface
 
         $providerId = $user->id;
 
-        $created = $this->findByEmailOrCreate($user, $ip);
+        $created = $this->findByEmailOrCreate($user, null, $ip);
 
         UserSocialLink::create([
             'provider'    => $provider,
@@ -120,7 +121,7 @@ class UserRepository implements UserRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function findByEmailOrCreate($user, $ip = null)
+    public function findByEmailOrCreate($user, $password = null, $ip = null)
     {
         $existingUser = $this->find('email', $user->email, $ip);
         if (!is_null($existingUser)) {
@@ -131,7 +132,7 @@ class UserRepository implements UserRepositoryInterface
             $user->name = explode('@', $user->email)[0];
         }
 
-        return $this->create($user, null, $ip);
+        return $this->create($user, $password, $ip);
     }
 
     /**
@@ -143,9 +144,15 @@ class UserRepository implements UserRepositoryInterface
 
         $userAttributes = $user->toArray();
 
-        if (!is_null($password)) {
-            $userAttributes['password'] = Hash::make($password);
+        if (isset($userAttributes['id'])) {
+            unset($userAttributes['id']);
         }
+
+        if (is_null($password)) {
+            $password = Helper::randomString(16);
+        }
+
+        $userAttributes['password'] = Hash::make($password);
 
         $userModel = new $model;
 
