@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.1.0 - 2023-06-08
+
+* Bug Fixes.
+
 ## 2.0.0 - 2023-06-06
 
 * Upgraded to `ssofy/php-sk:2.0.0`.
