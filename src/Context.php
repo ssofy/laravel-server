@@ -55,7 +55,7 @@ class Context
             'key'         => $config['key'],
             'secret'      => $config['secret'],
             'secure'      => $config['secure'],
-            'cache_store' => isset($config['cache']['store']) ? app(Storage::class, [
+            'cache_store' => !empty($config['cache']['store']) ? app(Storage::class, [
                 'driver' => $config['cache']['store']
             ]) : null,
             'cache_ttl'   => $config['cache']['ttl'],
@@ -89,7 +89,7 @@ class Context
             'pkce_method'       => $config['pkce_method'],
             'timeout'           => $config['timeout'],
             'scopes'            => $config['scopes'],
-            'state_store'       => isset($config['state']['store']) ? app(Storage::class, [
+            'state_store'       => !empty($config['state']['store']) ? app(Storage::class, [
                 'driver' => $config['state']['store'],
             ]) : null,
             'state_ttl'         => $config['state']['ttl'],
