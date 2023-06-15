@@ -64,7 +64,14 @@ class OAuthClientController extends AbstractController
         $redirectUri = $request->input('redirect_uri', null);
         $everywhere  = boolval($request->input('everywhere', false));
 
-        return redirect($this->context->ssoClient()->getLogoutUrl($redirectUri, $everywhere));
+        $ssoClient = $this->context->ssoClient();
+
+        $sessionState = $ssoClient->getSessionState();
+        if (empty($sessionState)) {
+            $ssoClient->deleteState($sessionState);
+        }
+
+        return redirect($ssoClient->getLogoutUrl($redirectUri, $everywhere));
     }
 
     public function socialAuth(Request $request, $provider)
