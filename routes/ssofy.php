@@ -42,6 +42,6 @@ $router->group([
     'middleware' => ['web']
 ], function () use ($router) {
     $router->get('/callback', 'OAuthClientController@handleRedirectBack');
-    $router->get('/logout', 'OAuthClientController@logout');
-    $router->get('/social/{provider}', 'OAuthClientController@socialAuth');
+    $router->get('/logout', 'OAuthClientController@logout')->name('sso.logout');
+    $router->get('/social/{provider}', 'OAuthClientController@socialAuth')->name('sso.social');
 });
