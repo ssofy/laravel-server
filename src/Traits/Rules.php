@@ -105,17 +105,4 @@ trait Rules
             'scopes.*' => ['string'],
         ];
     }
-
-    /**
-     * @return array
-     */
-    public function oauth2ClientRedirectRules()
-    {
-        return [
-            'state'             => ['required', 'string', 'min:1'],
-            'code'              => ['string', 'min:1'],
-            'error'             => ['string'],
-            'error_description' => ['string'],
-        ];
-    }
 }

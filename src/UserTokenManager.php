@@ -2,7 +2,7 @@
 
 namespace SSOfy\Laravel;
 
-use Illuminate\Support\Str;
+use SSOfy\Helper;
 use SSOfy\Storage\StorageInterface;
 
 class UserTokenManager
@@ -14,7 +14,7 @@ class UserTokenManager
 
     public function __construct()
     {
-        $this->store = app('cache')->store(config('ssofy.otp.store'));
+        $this->store = app('cache')->store(config('ssofy-server.otp.store'));
     }
 
     /**
@@ -24,7 +24,7 @@ class UserTokenManager
      */
     public function randomStringToken($userId, $ttl = 60, $length = 32, $group = null)
     {
-        $token = Str::random($length);
+        $token = Helper::randomString($length);
 
         $this->store->put($this->cacheKey($token, $group), $userId, $ttl);
 

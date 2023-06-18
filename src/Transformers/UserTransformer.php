@@ -23,7 +23,7 @@ class UserTransformer
             }
         }
 
-        $metadataColumn = config('ssofy.user.column.metadata');
+        $metadataColumn = config('ssofy-server.user.columns.metadata');
 
         return new UserEntity(
             array_merge($metadata, [
@@ -44,7 +44,7 @@ class UserTransformer
 
     private function get($user, $column, $default = null)
     {
-        $mappedColumn = config('ssofy.user.column.' . $column);
+        $mappedColumn = config('ssofy-server.user.columns.' . $column);
 
         if (is_null($mappedColumn) || trim($mappedColumn) === '') {
             return null;

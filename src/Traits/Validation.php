@@ -16,11 +16,11 @@ trait Validation
     {
         $validated = $request->validate($this->passwordAuthRules(), $request->input());
 
-        if (!config('ssofy.authentication.' . $validated['method'], false)) {
+        if (!config('ssofy-server.authentication.methods.' . $validated['method'], false)) {
             abort(401, 'Unauthorized');
         }
 
-        if (empty($validated['password']) && !config('ssofy.authentication.passwordless', false)) {
+        if (empty($validated['password']) && !config('ssofy-server.authentication.passwordless', false)) {
             abort(401, 'Unauthorized');
         }
 
@@ -88,14 +88,5 @@ trait Validation
     public function validateUserEntityRequest(Request $request)
     {
         return $request->validate($this->userEntityRules(), $request->input());
-    }
-
-    /**
-     * @param Request $request
-     * @return array
-     */
-    public function validateOAuth2ClientRedirectRequest(Request $request)
-    {
-        return $request->validate($this->oauth2ClientRedirectRules(), $request->input());
     }
 }
