@@ -5,24 +5,13 @@ namespace SSOfy\Laravel\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Str;
 use SSOfy\Exceptions\Exception;
-use SSOfy\Laravel\Context;
+use SSOfy\Helper;
 use SSOfy\Models\BaseModel;
 use SSOfy\SignatureGenerator;
 
 class ResponseMiddleware
 {
-    /**
-     * @var Context
-     */
-    private $context;
-
-    public function __construct(Context $context)
-    {
-        $this->context = $context;
-    }
-
     /**
      * @param Request $request
      * @param Closure $next
@@ -61,13 +50,14 @@ class ResponseMiddleware
 
         $signatureGenerator = new SignatureGenerator();
 
-        $path = '/' . ltrim($request->path(), '/');
-        $salt = Str::random(rand(16, 32));
+        $path   = '/' . ltrim($request->path(), '/');
+        $secret = config('ssofy-server.secret');
+        $salt   = Helper::randomString(rand(16, 32));
 
         return $response
             ->setContent(json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
             ->withHeaders([
-                'Signature' => base64_encode(json_encode($signatureGenerator->generate($path, $body, $this->context->defaultAPIConfig()->getSecret(), $salt)->toArray())),
+                'Signature' => base64_encode(json_encode($signatureGenerator->generate($path, $body, $secret, $salt)->toArray())),
             ]);
     }
 

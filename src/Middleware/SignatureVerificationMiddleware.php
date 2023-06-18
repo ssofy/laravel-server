@@ -4,21 +4,11 @@ namespace SSOfy\Laravel\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use SSOfy\Laravel\Context;
-use SSOfy\SignatureValidator;
+use SSOfy\SignatureGenerator;
+use SSOfy\SignatureVerifier;
 
-class SignatureValidationMiddleware
+class SignatureVerificationMiddleware
 {
-    /**
-     * @var Context
-     */
-    private $context;
-
-    public function __construct(Context $context)
-    {
-        $this->context = $context;
-    }
-
     /**
      * @param Request $request
      * @param Closure $next
@@ -34,10 +24,12 @@ class SignatureValidationMiddleware
 
         $path   = '/' . ltrim($request->path(), '/');
         $params = $request->input();
+        $secret = config('ssofy-server.secret');
 
-        $validator = new SignatureValidator($this->context->defaultAPIConfig());
+        $signatureGenerator = new SignatureGenerator();
+        $validator = new SignatureVerifier($signatureGenerator);
 
-        if (false === $validator->verifyBase64Signature($path, $params, $signature)) {
+        if (false === $validator->verifyBase64Signature($path, $params, $secret, $signature)) {
             return response('', 400);
         }
 
