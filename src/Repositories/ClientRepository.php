@@ -12,7 +12,7 @@ class ClientRepository implements ClientRepositoryInterface
      */
     public function findById($id)
     {
-        $data = config('ssofy.data.clients');
+        $data = config('ssofy-server.data.clients');
 
         if (!isset($data[$id])) {
             return null;

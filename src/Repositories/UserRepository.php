@@ -2,7 +2,6 @@
 
 namespace SSOfy\Laravel\Repositories;
 
-use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
@@ -11,14 +10,11 @@ use SSOfy\Helper;
 use SSOfy\Laravel\Models\UserSocialLink;
 use SSOfy\Laravel\UserTokenManager;
 use SSOfy\Laravel\Repositories\Contracts\UserRepositoryInterface;
-use SSOfy\Laravel\Traits\Guard;
 use SSOfy\Laravel\Transformers\UserTransformer;
 use SSOfy\Models\Entities\TokenEntity;
 
 class UserRepository implements UserRepositoryInterface
 {
-    use Guard;
-
     /**
      * @var UserTokenManager
      */
@@ -45,9 +41,9 @@ class UserRepository implements UserRepositoryInterface
      */
     public function findById($id, $ip = null)
     {
-        $user = $this->cache(['id' => $id], function () use ($id) {
-            return $this->userProvider()->retrieveById($id);
-        });
+        $model = $this->getUserModel();
+
+        $user = $model::find($id);
 
         if (is_null($user)) {
             return null;
@@ -104,11 +100,11 @@ class UserRepository implements UserRepositoryInterface
     public function find($field, $value, $ip = null)
     {
         $user = $this->cache([$field => $value], function () use ($field, $value) {
+            $model = $this->getUserModel();
+
             $column = $this->getDBColumn($field);
 
-            return $this->userProvider()->retrieveByCredentials([
-                $column => $value,
-            ]);
+            return $model::where($column, $value);
         });
 
         if (is_null($user)) {
@@ -140,7 +136,7 @@ class UserRepository implements UserRepositoryInterface
      */
     public function create($user, $password = null, $ip = null)
     {
-        $model = config('ssofy.user.model');
+        $model = $this->getUserModel();
 
         $userAttributes = $user->toArray();
 
@@ -164,9 +160,9 @@ class UserRepository implements UserRepositoryInterface
      */
     public function update($user, $ip = null)
     {
-        $model = config('ssofy.user.model');
-
         $userAttributes = $user->toArray();
+
+        $model = $this->getUserModel();
 
         $userModel = $model::findOrFail($userAttributes['id']);
 
@@ -199,17 +195,20 @@ class UserRepository implements UserRepositoryInterface
      */
     public function verifyPassword($userId, $password = null, $ip = null)
     {
-        $user = $this->cache(['id' => $userId], function () use ($userId) {
-            return $this->userProvider()->retrieveById($userId);
-        });
+        $model = $this->getUserModel();
+
+        $user = $model::find($userId);
 
         if (is_null($user)) {
             return false;
         }
 
-        return $this->userProvider()->validateCredentials($user, [
-            config('ssofy.user.column.password') => $password,
-        ]);
+        /** @var BcryptHasher $hasher */
+        $hasher = app(BcryptHasher::class);
+
+        $passwordColumn = $this->getDBColumn('password');
+
+        return $hasher->check($password, $user->$passwordColumn);
     }
 
     /**
@@ -217,17 +216,18 @@ class UserRepository implements UserRepositoryInterface
      */
     public function updatePassword($userId, $password, $ip = null)
     {
-        $user = $this->cache(['id' => $userId], function () use ($userId) {
-            return $this->userProvider()->retrieveById($userId);
-        });
+        $model = $this->getUserModel();
+
+        $userModel = $model::findOrFail($userId);
 
         /** @var BcryptHasher $hasher */
         $hasher = app(BcryptHasher::class);
-        $user->forceFill([
-            'password' => $hasher->make($password),
-        ]);
 
-        $user->save();
+        $passwordColumn = $this->getDBColumn('password');
+
+        $userModel->$passwordColumn = $hasher->make($password);
+
+        $userModel->save();
     }
 
     protected function storeUser($userAttributes, $userModel)
@@ -265,16 +265,6 @@ class UserRepository implements UserRepositoryInterface
         return $this->userTransformer->transform($userModel);
     }
 
-    /**
-     * @return UserProvider
-     */
-    protected function userProvider()
-    {
-        $guardSettings = config('auth.guards.' . $this->findGuard());
-
-        return app('auth')->createUserProvider($guardSettings['provider']);
-    }
-
     protected function cache($criteria, $callback)
     {
         foreach ($criteria as $field => $value) {
@@ -302,7 +292,12 @@ class UserRepository implements UserRepositoryInterface
 
     protected function getDBColumn($column)
     {
-        return config("ssofy.user.column.$column");
+        return config("ssofy.user.columns.$column");
+    }
+
+    protected function getUserModel()
+    {
+        return config('ssofy-server.user.model');
     }
 
     protected function getModelCasts($model)

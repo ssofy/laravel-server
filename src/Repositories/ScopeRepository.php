@@ -14,7 +14,7 @@ class ScopeRepository implements ScopeRepositoryInterface
     {
         $result = [];
 
-        $data = config('ssofy.data.scopes');
+        $data = config('ssofy-server.data.scopes');
         foreach ($data as $id => $properties) {
             $scope        = new ScopeEntity($properties);
             $scope->id    = strval($id);
