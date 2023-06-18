@@ -16,11 +16,11 @@ $router->group([
     'prefix'     => '/external/ssofy/',
     'middleware' => ['ssofy.signature', 'ssofy.response']
 ], function () use ($router) {
-    $router->post('client', 'OAuthServerController@client');
+    $router->post('client', 'ResourceDataController@client');
 
-    $router->post('scopes', 'OAuthServerController@scopes');
+    $router->post('scopes', 'ResourceDataController@scopes');
 
-    $router->post('user', 'OAuthServerController@user');
+    $router->post('user', 'ResourceDataController@user');
 
     $router->post('otp-options', 'AuthController@otpOptions');
 
@@ -29,19 +29,4 @@ $router->group([
     $router->post('auth/social', 'AuthController@socialAuth');
 
     $router->post('event', 'EventController@handle');
-});
-
-/*
-|--------------------------------------------------------------------------
-| OAuth2Client Routes
-|--------------------------------------------------------------------------
-*/
-$router->group([
-    'namespace'  => 'SSOfy\Laravel\Controllers',
-    'prefix'     => '/sso/',
-    'middleware' => ['web']
-], function () use ($router) {
-    $router->get('/callback', 'OAuthClientController@handleRedirectBack');
-    $router->get('/logout', 'OAuthClientController@logout')->name('sso.logout');
-    $router->get('/social/{provider}', 'OAuthClientController@socialAuth')->name('sso.social');
 });
