@@ -3,38 +3,19 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | API Config
+    | Configurations
     |--------------------------------------------------------------------------
-    |
-    | These credentials are required for the API connection.
-    |
     */
-    'domain'         => env('SSOFY_DOMAIN', 'us-1.api.ssofy.com'),
-    'key'            => env('SSOFY_KEY'),
-    'secret'         => env('SSOFY_SECRET'),
-    'secure'         => env('SSOFY_SECURE', true),
+    'secret' => env('SSOFY_API_SECRET'),
 
-    /*
-    |--------------------------------------------------------------------------
-    | Cache Settings
-    |--------------------------------------------------------------------------
-    |
-    | Caching can speed up response time by reducing the number of connections
-    | to SSOfy. Once a token is deleted, a signal will be emitted to this
-    | application to request cache invalidation for the deleted token.
-    |
-    */
-    'cache'          => [
-        'store' => env('SSOFY_CACHE_DRIVER', null),
-        'ttl'   => env('SSOFY_CACHE_TTL', 10800), // time-to-live in seconds
-    ],
+    'event_queue' => env('SSOFY_EVENT_QUEUE', 'default'),
 
     /*
     |--------------------------------------------------------------------------
     | OTP Settings
     |--------------------------------------------------------------------------
     |
-    | Set up a cache driver to be used for temporary token storage, including
+    | Specify the cache driver to be used as temporary token storage, including
     | Action, OTP, and Auth tokens.
     |
     | Also, specify the Email and SMS channels to use when the user requests a
@@ -44,12 +25,16 @@ return [
     'otp'            => [
         'store'        => env('SSOFY_OTP_CACHE_DRIVER', 'file'),
         'notification' => [
-            'brand' => env('APP_NAME'),
+            'class' => SSOfy\Laravel\Notifications\OTPNotification::class,
 
             'email_channel' => env('SSOFY_OTP_EMAIL_CHANNEL', 'mail'),
 
             // 'nexmo' in older laravel versions
             'sms_chanel'    => env('SSOFY_OTP_SMS_CHANNEL', 'vonage'),
+
+            'settings' => [
+                'brand' => env('APP_NAME'),
+            ],
         ],
     ],
 
@@ -58,15 +43,17 @@ return [
     | Authentication Settings
     |--------------------------------------------------------------------------
     |
-    | Select which authentication methods to be allowed.
+    | Select which authentication methods to be enabled in server.
     |
     */
     'authentication' => [
-        'username'     => true,
-        'email'        => true,
-        'phone'        => true,
-        'token'        => true,
-        'otp'          => true,
+        'methods'      => [
+            'username' => true,
+            'email'    => true,
+            'phone'    => true,
+            'token'    => true,
+            'otp'      => true,
+        ],
         'passwordless' => true,
     ],
 
@@ -85,7 +72,6 @@ return [
         'scope'  => \SSOfy\Laravel\Repositories\ScopeRepository::class,
         'user'   => \SSOfy\Laravel\Repositories\UserRepository::class,
         'otp'    => \SSOfy\Laravel\Repositories\OTPRepository::class,
-        'api'    => \SSOfy\Laravel\Repositories\APIRepository::class,
     ],
 
     /*
@@ -94,15 +80,17 @@ return [
     |--------------------------------------------------------------------------
     */
     'user'           => [
-        'model' => \App\Models\User::class, // Required only for "Registration" and "Password Reset" functionalities.
+        'model' => \App\Models\User::class,
 
-        'filter' => \SSOfy\Laravel\Filters\UserFilter::class,
+        'filter'  => \SSOfy\Laravel\Filters\UserFilter::class,
 
         /**
          * Specify the actual column name for each of the user claims.
          * Set to null if no column exists in the database for the claim.
+         *
+         * "[CLAIM]" => "[COLUMN]"
          */
-        'column' => [
+        'columns' => [
             'id'                => 'id',
             'hash'              => 'id',
             'name'              => 'name',
@@ -120,7 +108,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Fixed Data
+    | Static Data
     |--------------------------------------------------------------------------
     |
     | Default repositories generate a predefined set of scopes and clients,
@@ -130,7 +118,7 @@ return [
     | extend the default repositories by overriding methods to meet your
     | requirements.
     |
-    | Read more in docs: https://www.ssofy.com/docs/SDK/Laravel/Repositories
+    | Read more in docs: https://www.ssofy.com/docs/SDK/LaravelServer/Repositories
     |
     */
     'data'           => [
