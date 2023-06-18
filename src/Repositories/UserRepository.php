@@ -104,7 +104,7 @@ class UserRepository implements UserRepositoryInterface
 
             $column = $this->getDBColumn($field);
 
-            return $model::where($column, $value);
+            return $model::where($column, $value)->first();
         });
 
         if (is_null($user)) {
@@ -290,9 +290,9 @@ class UserRepository implements UserRepositoryInterface
         return $user;
     }
 
-    protected function getDBColumn($column)
+    protected function getDBColumn($claim)
     {
-        return config("ssofy.user.columns.$column");
+        return config("ssofy-server.user.columns.{$claim}");
     }
 
     protected function getUserModel()

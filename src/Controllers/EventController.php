@@ -151,7 +151,7 @@ class EventController extends Controller
      */
     protected function tokenDeleted($payload)
     {
-        dispatch(new TokenDeleted($payload['token']))->onQueue($this->getEventQueueName());
+        event(new TokenDeleted($payload['token']));
     }
 
     /**
@@ -161,7 +161,7 @@ class EventController extends Controller
      */
     protected function safetyReset()
     {
-        dispatch(new SafetyReset())->onQueue($this->getEventQueueName());
+        event(new SafetyReset());
     }
 
     /**
@@ -193,7 +193,7 @@ class EventController extends Controller
                 ])
             );
 
-            dispatch(new OTPSent($option))->onQueue($this->getEventQueueName());
+            event(new OTPSent($option));
         }
     }
 
@@ -216,7 +216,7 @@ class EventController extends Controller
 
         $user = $userRepository->create($user, Arr::get($payload['user'], 'password'), $ip);
 
-        dispatch(new UserCreated($user, $ip))->onQueue($this->getEventQueueName());
+        event(new UserCreated($user, $ip));
     }
 
     /**
@@ -237,7 +237,7 @@ class EventController extends Controller
 
         $user = $userRepository->update($user, $ip);
 
-        dispatch(new UserUpdated($user, $ip))->onQueue($this->getEventQueueName());
+        event(new UserUpdated($user, $ip));
     }
 
     /**
@@ -260,7 +260,7 @@ class EventController extends Controller
 
         $userRepository->deleteToken($payload['token']);
 
-        dispatch(new UserUpdated($user, $ip))->onQueue($this->getEventQueueName());
+        event(new UserUpdated($user, $ip));
     }
 
     protected function getEventQueueName()

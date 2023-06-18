@@ -64,7 +64,7 @@ class AuthController extends Controller
             $token = $userRepository->createToken($user->id, $ttl);
         }
 
-        dispatch(new UserAuthenticated($user, $method, $ip))->onQueue($this->getEventQueueName());
+        event(new UserAuthenticated($user, $method, $ip));
 
         /** @var UserFilterInterface $filter */
         $filter = app(config('ssofy-server.user.filter'));
@@ -92,7 +92,7 @@ class AuthController extends Controller
             abort(401, 'Unauthorized');
         }
 
-        dispatch(new UserAuthenticated($user, UserAuthenticated::METHOD_TOKEN, $ip))->onQueue($this->getEventQueueName());
+        event(new UserAuthenticated($user, UserAuthenticated::METHOD_TOKEN, $ip));
 
         return new AuthResponseEntity([
             'user' => $user
@@ -125,7 +125,7 @@ class AuthController extends Controller
             abort(409, 'Duplicate');
         }
 
-        dispatch(new UserAuthenticated($user, UserAuthenticated::METHOD_SOCIAL, $ip))->onQueue($this->getEventQueueName());
+        event(new UserAuthenticated($user, UserAuthenticated::METHOD_SOCIAL, $ip));
 
         return new AuthResponseEntity([
             'user' => $user
