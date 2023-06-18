@@ -54,7 +54,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "SSOfy\\Laravel\\ServiceProvider"
+                "SSOfy\\Laravel\\ServerServiceProvider"
             ]
         }
     }

@@ -3,6 +3,7 @@
 namespace SSOfy\Laravel\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use SSOfy\Laravel\Events\UserAuthenticated;
 use SSOfy\Laravel\Filters\Contracts\UserFilterInterface;
 use SSOfy\Laravel\Repositories\Contracts\OTPRepositoryInterface;
@@ -13,7 +14,7 @@ use SSOfy\Models\Entities\AuthResponseEntity;
 use SSOfy\Models\Entities\OTPOptionEntity;
 use SSOfy\Models\Entities\UserEntity;
 
-class AuthController extends AbstractController
+class AuthController extends Controller
 {
     use Validation;
     use Mask;

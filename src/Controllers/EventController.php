@@ -3,6 +3,7 @@
 namespace SSOfy\Laravel\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Notification;
 use SSOfy\Laravel\Events\OTPSent;
@@ -17,7 +18,7 @@ use SSOfy\Laravel\Traits\Validation;
 use SSOfy\Models\Entities\OTPOptionEntity;
 use SSOfy\Models\Entities\UserEntity;
 
-class EventController extends AbstractController
+class EventController extends Controller
 {
     use Validation;
 

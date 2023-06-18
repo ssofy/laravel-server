@@ -17,7 +17,7 @@ use SSOfy\Laravel\Repositories\OTPRepository;
 use SSOfy\Laravel\Repositories\ScopeRepository;
 use SSOfy\Laravel\Repositories\UserRepository;
 
-class ServiceProvider extends LaravelAuthServiceProvider
+class ServerServiceProvider extends LaravelAuthServiceProvider
 {
     public function register()
     {
@@ -67,7 +67,7 @@ class ServiceProvider extends LaravelAuthServiceProvider
 
         // routes
         $this->publishes([
-            __DIR__ . '/../routes/ssofy-server.php' => base_path('/routes/ssofy.php'),
+            __DIR__ . '/../routes/ssofy-server.php' => base_path('/routes/ssofy-server.php'),
         ], ['ssofy', 'ssofy:routes']);
 
         // views

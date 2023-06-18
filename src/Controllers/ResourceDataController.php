@@ -3,6 +3,7 @@
 namespace SSOfy\Laravel\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use SSOfy\Laravel\Filters\Contracts\UserFilterInterface;
 use SSOfy\Laravel\Repositories\Contracts\ClientRepositoryInterface;
 use SSOfy\Laravel\Repositories\Contracts\ScopeRepositoryInterface;
@@ -12,7 +13,7 @@ use SSOfy\Models\Entities\ClientEntity;
 use SSOfy\Models\Entities\ScopeEntity;
 use SSOfy\Models\Entities\UserEntity;
 
-class ResourceDataController extends AbstractController
+class ResourceDataController extends Controller
 {
     use Validation;
 
