@@ -1,16 +1,13 @@
 # CHANGELOG
 
-## 2.1.0 - 2023-06-08
-
-* Bug Fixes.
-
-## 2.0.0 - 2023-06-06
+## 2.0.0 - 2023-06-18
 
 * Upgraded to `ssofy/php-sk:2.0.0`.
-* Split of the config file into `sso.php` and `sso-config.php`.
-* The `OTP` class is renamed to `UserTokenManager` for readability.
-* Added the route for logout (`/sso/logout?everywhere=0`).
-* Added the route for social login (`/sso//social/google`).
+* Removed SSO Client functionality.
+* Renamed the config file to `sso-server.php`.
+* The `OTP` class is renamed to `UserTokenManager` to avoid confusions.
+* Repositories manipulate database directly instead of relying on User Provider.
+* Dispatching Events for various operations done.
 * Bug Fixes.
 
 ## 1.0.4 - 2023-06-02
