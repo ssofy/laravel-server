@@ -1,4 +1,4 @@
-SSOfy Laravel Package
+SSOfy Laravel (Server) Package
 =============
 
 #### Official [SSOfy](https://www.ssofy.com) Laravel Package.
@@ -10,7 +10,7 @@ Read the full [documentation](https://www.ssofy.com/docs/SDK/Laravel/Installatio
 ### Installing via Composer
 
 ```bash
-composer require ssofy/laravel
+composer require ssofy/laravel-server
 ```
 
 ## Support
