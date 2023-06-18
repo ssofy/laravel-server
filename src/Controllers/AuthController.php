@@ -3,6 +3,7 @@
 namespace SSOfy\Laravel\Controllers;
 
 use Illuminate\Http\Request;
+use SSOfy\Laravel\Events\UserAuthenticated;
 use SSOfy\Laravel\Filters\Contracts\UserFilterInterface;
 use SSOfy\Laravel\Repositories\Contracts\OTPRepositoryInterface;
 use SSOfy\Laravel\Repositories\Contracts\UserRepositoryInterface;
@@ -62,8 +63,10 @@ class AuthController extends AbstractController
             $token = $userRepository->createToken($user->id, $ttl);
         }
 
+        dispatch(new UserAuthenticated($user, $method, $ip))->onQueue($this->getEventQueueName());
+
         /** @var UserFilterInterface $filter */
-        $filter = app(config('ssofy.user.filter'));
+        $filter = app(config('ssofy-server.user.filter'));
 
         return new AuthResponseEntity([
             'user'  => $filter->filter($user, []),
@@ -87,6 +90,8 @@ class AuthController extends AbstractController
         if (is_null($user)) {
             abort(401, 'Unauthorized');
         }
+
+        dispatch(new UserAuthenticated($user, UserAuthenticated::METHOD_TOKEN, $ip))->onQueue($this->getEventQueueName());
 
         return new AuthResponseEntity([
             'user' => $user
@@ -118,6 +123,8 @@ class AuthController extends AbstractController
         if (is_null($user)) {
             abort(409, 'Duplicate');
         }
+
+        dispatch(new UserAuthenticated($user, UserAuthenticated::METHOD_SOCIAL, $ip))->onQueue($this->getEventQueueName());
 
         return new AuthResponseEntity([
             'user' => $user
@@ -197,5 +204,10 @@ class AuthController extends AbstractController
         }
 
         return $user;
+    }
+
+    protected function getEventQueueName()
+    {
+        return config('ssofy-server.event_queue');
     }
 }

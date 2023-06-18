@@ -12,7 +12,7 @@ use SSOfy\Models\Entities\ClientEntity;
 use SSOfy\Models\Entities\ScopeEntity;
 use SSOfy\Models\Entities\UserEntity;
 
-class OAuthServerController extends AbstractController
+class ResourceDataController extends AbstractController
 {
     use Validation;
 
@@ -73,17 +73,14 @@ class OAuthServerController extends AbstractController
             'phone',
         ] as $field) {
             if ($request->has($field)) {
-                $user = $userRepository->find(
-                    config('ssofy.user.column.' . $field),
-                    $request->input($field)
-                );
+                $user = $userRepository->find($field, $request->input($field));
 
                 if (is_null($user)) {
                     abort(204, 'Not Found');
                 }
 
                 /** @var UserFilterInterface $filter */
-                $filter = app(config('ssofy.user.filter'));
+                $filter = app(config('ssofy-server.user.filter'));
 
                 return $filter->filter($user, $scopes);
             }

@@ -5,8 +5,11 @@ namespace SSOfy\Laravel\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Notification;
-use SSOfy\Laravel\Notifications\OTPNotification;
-use SSOfy\Laravel\Repositories\Contracts\APIRepositoryInterface;
+use SSOfy\Laravel\Events\OTPSent;
+use SSOfy\Laravel\Events\SafetyReset;
+use SSOfy\Laravel\Events\TokenDeleted;
+use SSOfy\Laravel\Events\UserCreated;
+use SSOfy\Laravel\Events\UserUpdated;
 use SSOfy\Laravel\Repositories\Contracts\OTPRepositoryInterface;
 use SSOfy\Laravel\Repositories\Contracts\UserRepositoryInterface;
 use SSOfy\Laravel\Rules\OTPVerification;
@@ -26,14 +29,10 @@ class EventController extends AbstractController
 
     /**
      * Handle event webhook.
-     *
-     * @param Request $request
-     * @return bool[]
      */
     public function handle(
-        Request                 $request,
-        APIRepositoryInterface  $apiRepository,
-        OTPRepositoryInterface  $otpRepository,
+        Request $request,
+        OTPRepositoryInterface $otpRepository,
         UserRepositoryInterface $userRepository
     ) {
         $this->validateEventRequest($request);
@@ -52,11 +51,11 @@ class EventController extends AbstractController
                 ])->validate();
                 //
 
-                $this->tokenDeleted($payload, $apiRepository);
+                $this->tokenDeleted($payload);
                 break;
 
             case 'safety_reset':
-                $this->safetyReset($apiRepository);
+                $this->safetyReset();
                 break;
 
             case 'send_otp':
@@ -94,7 +93,7 @@ class EventController extends AbstractController
                 $this->passwordReset($payload, $userRepository);
                 break;
 
-            case 'user_added':
+            case 'user_created':
                 /*
                  * Payload validation
                  */
@@ -106,7 +105,7 @@ class EventController extends AbstractController
                 //
 
                 try {
-                    $this->userAdded($payload, $userRepository);
+                    $this->userCreated($payload, $userRepository);
                 } catch (\SSOfy\Exceptions\Exception $exception) {
                     abort(400, 'Bad Request');
                 }
@@ -149,9 +148,9 @@ class EventController extends AbstractController
      * @param array $payload
      * @return void
      */
-    protected function tokenDeleted($payload, APIRepositoryInterface $apiRepository)
+    protected function tokenDeleted($payload)
     {
-        $apiRepository->deleteToken($payload['token']);
+        dispatch(new TokenDeleted($payload['token']))->onQueue($this->getEventQueueName());
     }
 
     /**
@@ -159,9 +158,9 @@ class EventController extends AbstractController
      *
      * @return void
      */
-    protected function safetyReset(APIRepositoryInterface $apiRepository)
+    protected function safetyReset()
     {
-        $apiRepository->deleteAllTokens();
+        dispatch(new SafetyReset())->onQueue($this->getEventQueueName());
     }
 
     /**
@@ -179,12 +178,21 @@ class EventController extends AbstractController
         /*
          * Send notification
          */
-        $brand   = config('ssofy.otp.notification.brand');
-        $channel = config("ssofy.otp.notification.{$option->type}_channel");
+        $settings   = config('ssofy-server.otp.notification.settings');
+        $channel = config("ssofy-server.otp.notification.{$option->type}_channel");
 
         if (isset($channel)) {
-            Notification::route($channel, $option->to)
-                        ->notify(new OTPNotification($brand, $code, [$channel]));
+            $notificationClass = config('ssofy-server.otp.notification.class');
+
+            Notification::route($channel, $option->to)->notify(
+                app($notificationClass, [
+                    'code'  => $code,
+                    'via'   => [$channel],
+                    'settings' => $settings,
+                ])
+            );
+
+            dispatch(new OTPSent($option))->onQueue($this->getEventQueueName());
         }
     }
 
@@ -195,15 +203,19 @@ class EventController extends AbstractController
      * @param UserRepositoryInterface $userRepository
      * @return void
      */
-    public function userAdded($payload, UserRepositoryInterface $userRepository)
+    protected function userCreated($payload, UserRepositoryInterface $userRepository)
     {
-        $payload['user']['id'] = '0';
+        $payload['user']['id']   = '0';
         $payload['user']['hash'] = '0';
+
+        $ip = Arr::get($payload, 'ip');
 
         /** @var UserEntity $user */
         $user = UserEntity::make($payload['user']);
 
-        $userRepository->create($user, Arr::get($payload['user'], 'password'), Arr::get($payload, 'ip'));
+        $user = $userRepository->create($user, Arr::get($payload['user'], 'password'), $ip);
+
+        dispatch(new UserCreated($user, $ip))->onQueue($this->getEventQueueName());
     }
 
     /**
@@ -213,14 +225,18 @@ class EventController extends AbstractController
      * @param UserRepositoryInterface $userRepository
      * @return void
      */
-    public function userUpdated($payload, UserRepositoryInterface $userRepository)
+    protected function userUpdated($payload, UserRepositoryInterface $userRepository)
     {
         $payload['user']['hash'] = $payload['user']['id'];
+
+        $ip = Arr::get($payload, 'ip');
 
         /** @var UserEntity $user */
         $user = UserEntity::make($payload['user']);
 
-        $userRepository->update($user, Arr::get($payload, 'ip'));
+        $user = $userRepository->update($user, $ip);
+
+        dispatch(new UserUpdated($user, $ip))->onQueue($this->getEventQueueName());
     }
 
     /**
@@ -230,15 +246,24 @@ class EventController extends AbstractController
      * @param UserRepositoryInterface $userRepository
      * @return void
      */
-    public function passwordReset($payload, UserRepositoryInterface $userRepository)
+    protected function passwordReset($payload, UserRepositoryInterface $userRepository)
     {
-        $user = $userRepository->findByToken($payload['token'], Arr::get($payload, 'ip'));
+        $ip = Arr::get($payload, 'ip');
+
+        $user = $userRepository->findByToken($payload['token'], $ip);
         if (is_null($user)) {
             abort(401, 'Unauthorized');
         }
 
-        $userRepository->updatePassword($user->id, $payload['password'], Arr::get($payload, 'ip'));
+        $userRepository->updatePassword($user->id, $payload['password'], $ip);
 
         $userRepository->deleteToken($payload['token']);
+
+        dispatch(new UserUpdated($user, $ip))->onQueue($this->getEventQueueName());
+    }
+
+    protected function getEventQueueName()
+    {
+        return config('ssofy-server.event_queue');
     }
 }
