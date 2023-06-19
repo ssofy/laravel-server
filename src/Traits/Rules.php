@@ -53,7 +53,7 @@ trait Rules
     protected function otpOptionsRules()
     {
         return [
-            'action'     => ['required', 'string', 'in:authorization,password_reset'],
+            'action'     => ['required', 'string', 'in:login,password_reset'],
             'method'     => ['required', 'string', 'in:username,email,phone'],
             'identifier' => ['required', 'string'],
             'ip'         => ['nullable', 'ip'],
