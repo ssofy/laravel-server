@@ -31,10 +31,12 @@ class OTPNotification extends Notification implements ShouldQueue
 
     public function toMail($notifiable)
     {
-        return (new MailMessage)->view('vendor/ssofy/otp/email', [
-            'code'     => $this->code,
-            'settings' => $this->settings,
-        ]);
+        return (new MailMessage)
+            ->subject('Verification Code')
+            ->view('vendor/ssofy/otp/email', [
+                'code'     => $this->code,
+                'settings' => $this->settings,
+            ]);
     }
 
     public function toNexmo($notifiable)
@@ -51,8 +53,8 @@ class OTPNotification extends Notification implements ShouldQueue
     {
         return trim(
             view('vendor/ssofy/otp/sms', [
-                'brand' => $this->brand,
-                'code'  => $this->code,
+                'code'     => $this->code,
+                'settings' => $this->settings,
             ])
         );
     }
