@@ -5,12 +5,12 @@ SSOfy Laravel (Server) Package
 
 ![](./docs/banner.png)
 
-Read the full [documentation](https://www.ssofy.com/docs/SDK/Laravel/Installation) at **SSOfy Knowledge Base**.
+Read the full [documentation](https://www.ssofy.com/docs/SDK/LaravelServer/Installation) at **SSOfy Knowledge Base**.
 
 ### Installing via Composer
 
 ```bash
-composer require ssofy/laravel-server
+composer require ssofy/laravel-server:^2.0.0
 ```
 
 ## Support
