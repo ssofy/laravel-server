@@ -13,15 +13,15 @@ class OTPNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private $brand;
     public $code;
-    private $via;
+    public $via;
+    public $settings;
 
-    public function __construct($brand, $code, $via)
+    public function __construct($code, $via, $settings)
     {
-        $this->brand = $brand;
-        $this->code  = $code;
-        $this->via   = $via;
+        $this->code     = $code;
+        $this->via      = $via;
+        $this->settings = $settings;
     }
 
     public function via($notifiable)
@@ -32,8 +32,8 @@ class OTPNotification extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)->view('vendor/ssofy/otp/email', [
-            'brand' => $this->brand,
-            'code'  => $this->code,
+            'code'     => $this->code,
+            'settings' => $this->settings,
         ]);
     }
 
@@ -49,9 +49,11 @@ class OTPNotification extends Notification implements ShouldQueue
 
     protected function getSMSMessage()
     {
-        return trim(view('vendor/ssofy/otp/sms', [
-            'brand' => $this->brand,
-            'code'  => $this->code,
-        ]));
+        return trim(
+            view('vendor/ssofy/otp/sms', [
+                'brand' => $this->brand,
+                'code'  => $this->code,
+            ])
+        );
     }
 }

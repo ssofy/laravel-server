@@ -59,7 +59,7 @@ class EventController extends Controller
                 $this->safetyReset();
                 break;
 
-            case 'send_otp':
+            case 'otp_requested':
                 /*
                  * Payload validation
                  */
