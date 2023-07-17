@@ -153,7 +153,7 @@ class AuthController extends Controller
             abort(401, 'Unauthorized');
         }
 
-        return $otpRepository->options($user->id, $action, $ip);
+        return $otpRepository->findAllByAction($user->id, $action, $ip);
     }
 
 
@@ -167,20 +167,21 @@ class AuthController extends Controller
         $optionId,
         $code,
         $ip,
-        OTPRepositoryInterface $otpRepository,
+        OTPRepositoryInterface  $otpRepository,
         UserRepositoryInterface $userRepository
     ) {
-        $userId = $otpRepository->getUserId($optionId, $code);
-        if (is_null($userId)) {
+        if (!$otpRepository->verify($optionId, $code, $ip)) {
             return false;
         }
 
-        $user = $userRepository->findById($userId, $ip);
+        $option = $otpRepository->findById($optionId, $ip);
+
+        $user = $userRepository->findById($option->user_id, $ip);
         if (is_null($user)) {
             return false;
         }
 
-        $otpRepository->destroyVerificationCode($optionId, $code);
+        $otpRepository->destroyVerificationCode($optionId, $code, $ip);
 
         return $user;
     }

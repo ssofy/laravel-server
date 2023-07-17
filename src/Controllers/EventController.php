@@ -76,7 +76,7 @@ class EventController extends Controller
                 ])->validate();
                 //
 
-                $this->sendOTP($payload, $otpRepository);
+                $this->sendOTP($payload, $otpRepository, $request->input('ip'));
                 break;
 
             case 'password_reset':
@@ -170,11 +170,11 @@ class EventController extends Controller
      * @param array $payload
      * @return void
      */
-    protected function sendOTP($payload, OTPRepositoryInterface $otpRepository)
+    protected function sendOTP($payload, OTPRepositoryInterface $otpRepository, $ip = null)
     {
         $option = new OTPOptionEntity($payload['option']);
 
-        $code = $otpRepository->newVerificationCode($option);
+        $code = $otpRepository->newVerificationCode($option, $ip);
 
         /*
          * Send notification

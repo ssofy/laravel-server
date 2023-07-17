@@ -7,39 +7,49 @@ use SSOfy\Models\Entities\OTPOptionEntity;
 interface OTPRepositoryInterface
 {
     /**
-     * List of OTP options for the requested action.
+     * Get list of OTP options for the requested action.
      *
      * @param string $userId
      * @param string $action
      * @param string|null $ip
      * @return OTPOptionEntity[]
      */
-    public function options($userId, $action, $ip = null);
+    public function findAllByAction($userId, $action, $ip = null);
+
+    /**
+     * Find OTP Option by id
+     *
+     * @param string $optionId
+     * @param string|null $ip
+     * @return OTPOptionEntity|null
+     */
+    public function findById($optionId, $ip = null);
 
     /**
      * Generate and store a new OTP code for the selected option.
      * Returns the generated code.
      *
      * @param OTPOptionEntity $option
+     * @param string|null $ip
      * @return string
      */
-    public function newVerificationCode($option);
+    public function newVerificationCode($option, $ip = null);
 
     /**
      * Expire a previously generated OTP.
      *
      * @param string $optionId
      * @param string $code
+     * @param string|null $ip
      * @return void
      */
-    public function destroyVerificationCode($optionId, $code);
+    public function destroyVerificationCode($optionId, $code, $ip = null);
 
     /**
-     * Get user id which was previously stored for a selected option and code.
-     *
      * @param string $optionId
      * @param string $code
-     * @return integer|null User ID or null if OTP is invalid
+     * @param string|null $ip
+     * @return bool
      */
-    public function getUserId($optionId, $code);
+    public function verify($optionId, $code, $ip = null);
 }

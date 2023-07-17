@@ -31,38 +31,21 @@ class OTPRepository implements OTPRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function options($userId, $action, $ip = null)
+    public function findAllByAction($userId, $action, $ip = null)
     {
         $user = $this->userRepository->findById($userId, $ip);
         if (is_null($userId)) {
             return null;
         }
 
-        $email = $user->email;
-        $phone = $user->phone;
-
         $options = [];
 
-        if (!empty($email)) {
-            $options[] = new OTPOptionEntity([
-                'id'      => "$action-email-{$user->id}",
-                'type'    => 'email',
-                'to'      => $email,
-                'hint'    => $this->hideEmailAddress($email),
-                'user_id' => $user->id,
-                'action'  => $action,
-            ]);
+        if (!empty($user->email)) {
+            $options[] = $this->generateEmailOtpOption($action, $user);
         }
 
-        if (!empty($phone)) {
-            $options[] = new OTPOptionEntity([
-                'id'      => "$action-sms-{$user->id}",
-                'type'    => 'sms',
-                'to'      => $phone,
-                'hint'    => $this->hidePhoneNumber($phone),
-                'user_id' => $user->id,
-                'action'  => $action,
-            ]);
+        if (!empty($user->phone)) {
+            $options[] = $this->generateSMSOtpOption($action, $user);
         }
 
         return $options;
@@ -71,7 +54,25 @@ class OTPRepository implements OTPRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function newVerificationCode($option)
+    public function findById($optionId, $ip = null)
+    {
+        $parts = explode('-', $optionId);
+
+        switch ($parts[1]) {
+            case 'email':
+                return $this->generateEmailOtpOption($parts[0], $this->userRepository->findById($parts[2], $ip));
+
+            case 'sms':
+                return $this->generateSMSOtpOption($parts[0], $this->userRepository->findById($parts[2], $ip));
+        }
+
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function newVerificationCode($option, $ip = null)
     {
         $group = "otp-{$option->id}";
         return $this->otp->randomDigitsToken($option->user_id, 60 * 60, 6, $group);
@@ -80,18 +81,65 @@ class OTPRepository implements OTPRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function destroyVerificationCode($optionId, $code)
+    public function destroyVerificationCode($optionId, $code, $ip = null)
     {
         $group = "otp-$optionId";
         $this->otp->forget($code, $group);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getUserId($optionId, $code)
+    public function verify($optionId, $code, $ip = null)
     {
         $group = "otp-$optionId";
-        return $this->otp->verify($code, $group);
+
+        $ok = $this->otp->verify($code, $group) !== false;
+
+        if (!$ok) {
+            return false;
+        }
+
+        // mark user's email/phone as verified
+
+        $option = $this->findById($optionId);
+
+        $user = $this->userRepository->findById($option->user_id, $ip);
+        if (is_null($user)) {
+            return true;
+        }
+
+        if ($option->type === 'email' && !$user->email_verified) {
+            $user->email_verified = true;
+            $this->userRepository->update($user, $ip);
+        }
+
+        if ($option->type === 'sms' && !$user->phone_verified) {
+            $user->phone_verified = true;
+            $this->userRepository->update($user, $ip);
+        }
+
+        return true;
+    }
+
+    private function generateEmailOtpOption($action, $user)
+    {
+        return new OTPOptionEntity([
+            'id'      => "$action-email-{$user->id}",
+            'type'    => 'email',
+            'to'      => $user->email,
+            'hint'    => $this->hideEmailAddress($user->email),
+            'user_id' => $user->id,
+            'action'  => $action,
+        ]);
+    }
+
+    private function generateSMSOtpOption($action, $user)
+    {
+        return new OTPOptionEntity([
+            'id'      => "$action-sms-{$user->id}",
+            'type'    => 'sms',
+            'to'      => $user->phone,
+            'hint'    => $this->hidePhoneNumber($user->phone),
+            'user_id' => $user->id,
+            'action'  => $action,
+        ]);
     }
 }
