@@ -40,11 +40,11 @@ class OTPRepository implements OTPRepositoryInterface
 
         $options = [];
 
-        if (!empty($user->email)) {
+        if (!is_null($user->email)) {
             $options[] = $this->generateEmailOtpOption($action, $user);
         }
 
-        if (!empty($user->phone)) {
+        if (!is_null($user->phone)) {
             $options[] = $this->generateSMSOtpOption($action, $user);
         }
 
