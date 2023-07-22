@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.3 - 2023-07-22
+
+* Hotfix: OTPRepository fixed.
+
 ## 2.0.2 - 2023-07-22
 
 * Fixed the SMS OTP error.
