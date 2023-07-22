@@ -6,17 +6,17 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Notification;
+use SSOfy\Repositories\OTPRepositoryInterface;
+use SSOfy\Repositories\UserRepositoryInterface;
+use SSOfy\Models\Entities\OTPOptionEntity;
+use SSOfy\Models\Entities\UserEntity;
+use SSOfy\Laravel\Traits\Validation;
+use SSOfy\Laravel\Rules\OTPVerification;
 use SSOfy\Laravel\Events\OTPSent;
 use SSOfy\Laravel\Events\SafetyReset;
 use SSOfy\Laravel\Events\TokenDeleted;
 use SSOfy\Laravel\Events\UserCreated;
 use SSOfy\Laravel\Events\UserUpdated;
-use SSOfy\Laravel\Repositories\Contracts\OTPRepositoryInterface;
-use SSOfy\Laravel\Repositories\Contracts\UserRepositoryInterface;
-use SSOfy\Laravel\Rules\OTPVerification;
-use SSOfy\Laravel\Traits\Validation;
-use SSOfy\Models\Entities\OTPOptionEntity;
-use SSOfy\Models\Entities\UserEntity;
 
 class EventController extends Controller
 {

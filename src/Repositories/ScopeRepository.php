@@ -2,7 +2,7 @@
 
 namespace SSOfy\Laravel\Repositories;
 
-use SSOfy\Laravel\Repositories\Contracts\ScopeRepositoryInterface;
+use SSOfy\Repositories\ScopeRepositoryInterface;
 use SSOfy\Models\Entities\ScopeEntity;
 
 class ScopeRepository implements ScopeRepositoryInterface
@@ -10,7 +10,7 @@ class ScopeRepository implements ScopeRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function findAll($lang)
+    public function all($lang)
     {
         $result = [];
 

@@ -3,16 +3,16 @@
 namespace SSOfy\Laravel;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as LaravelAuthServiceProvider;
+use SSOfy\Repositories\ClientRepositoryInterface;
+use SSOfy\Repositories\OTPRepositoryInterface;
+use SSOfy\Repositories\ScopeRepositoryInterface;
+use SSOfy\Repositories\UserRepositoryInterface;
 use SSOfy\Laravel\Commands\UserTokenDelete;
 use SSOfy\Laravel\Commands\UserTokenGeneration;
 use SSOfy\Laravel\Commands\UserTokenVerification;
 use SSOfy\Laravel\Middleware\ResponseMiddleware;
 use SSOfy\Laravel\Middleware\SignatureVerificationMiddleware;
 use SSOfy\Laravel\Repositories\ClientRepository;
-use SSOfy\Laravel\Repositories\Contracts\ClientRepositoryInterface;
-use SSOfy\Laravel\Repositories\Contracts\OTPRepositoryInterface;
-use SSOfy\Laravel\Repositories\Contracts\ScopeRepositoryInterface;
-use SSOfy\Laravel\Repositories\Contracts\UserRepositoryInterface;
 use SSOfy\Laravel\Repositories\OTPRepository;
 use SSOfy\Laravel\Repositories\ScopeRepository;
 use SSOfy\Laravel\Repositories\UserRepository;

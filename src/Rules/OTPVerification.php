@@ -2,7 +2,6 @@
 
 namespace SSOfy\Laravel\Rules;
 
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Validation\Rule;
 use SSOfy\Laravel\UserTokenManager;
 

@@ -2,11 +2,11 @@
 
 namespace SSOfy\Laravel\Repositories;
 
-use SSOfy\Laravel\UserTokenManager;
-use SSOfy\Laravel\Repositories\Contracts\OTPRepositoryInterface;
-use SSOfy\Laravel\Repositories\Contracts\UserRepositoryInterface;
-use SSOfy\Laravel\Traits\Mask;
+use SSOfy\Repositories\OTPRepositoryInterface;
+use SSOfy\Repositories\UserRepositoryInterface;
 use SSOfy\Models\Entities\OTPOptionEntity;
+use SSOfy\Laravel\UserTokenManager;
+use SSOfy\Laravel\Traits\Mask;
 
 class OTPRepository implements OTPRepositoryInterface
 {

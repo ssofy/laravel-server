@@ -7,11 +7,11 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use ReflectionClass;
 use SSOfy\Helper;
+use SSOfy\Repositories\UserRepositoryInterface;
+use SSOfy\Models\Entities\TokenEntity;
 use SSOfy\Laravel\Models\UserSocialLink;
 use SSOfy\Laravel\UserTokenManager;
-use SSOfy\Laravel\Repositories\Contracts\UserRepositoryInterface;
 use SSOfy\Laravel\Transformers\UserTransformer;
-use SSOfy\Models\Entities\TokenEntity;
 
 class UserRepository implements UserRepositoryInterface
 {

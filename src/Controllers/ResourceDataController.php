@@ -4,14 +4,14 @@ namespace SSOfy\Laravel\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use SSOfy\Laravel\Filters\Contracts\UserFilterInterface;
-use SSOfy\Laravel\Repositories\Contracts\ClientRepositoryInterface;
-use SSOfy\Laravel\Repositories\Contracts\ScopeRepositoryInterface;
-use SSOfy\Laravel\Repositories\Contracts\UserRepositoryInterface;
-use SSOfy\Laravel\Traits\Validation;
+use SSOfy\Repositories\ClientRepositoryInterface;
+use SSOfy\Repositories\ScopeRepositoryInterface;
+use SSOfy\Repositories\UserRepositoryInterface;
 use SSOfy\Models\Entities\ClientEntity;
 use SSOfy\Models\Entities\ScopeEntity;
 use SSOfy\Models\Entities\UserEntity;
+use SSOfy\Laravel\Filters\Contracts\UserFilterInterface;
+use SSOfy\Laravel\Traits\Validation;
 
 class ResourceDataController extends Controller
 {
@@ -34,7 +34,7 @@ class ResourceDataController extends Controller
 
         $lang = $request->input('lang');
 
-        return $scopeRepository->findAll($lang);
+        return $scopeRepository->all($lang);
     }
 
     /**

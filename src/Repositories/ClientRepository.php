@@ -2,7 +2,7 @@
 
 namespace SSOfy\Laravel\Repositories;
 
-use SSOfy\Laravel\Repositories\Contracts\ClientRepositoryInterface;
+use SSOfy\Repositories\ClientRepositoryInterface;
 use SSOfy\Models\Entities\ClientEntity;
 
 class ClientRepository implements ClientRepositoryInterface

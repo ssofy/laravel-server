@@ -4,15 +4,15 @@ namespace SSOfy\Laravel\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use SSOfy\Laravel\Events\UserAuthenticated;
-use SSOfy\Laravel\Filters\Contracts\UserFilterInterface;
-use SSOfy\Laravel\Repositories\Contracts\OTPRepositoryInterface;
-use SSOfy\Laravel\Repositories\Contracts\UserRepositoryInterface;
-use SSOfy\Laravel\Traits\Mask;
-use SSOfy\Laravel\Traits\Validation;
+use SSOfy\Repositories\OTPRepositoryInterface;
+use SSOfy\Repositories\UserRepositoryInterface;
 use SSOfy\Models\Entities\AuthResponseEntity;
 use SSOfy\Models\Entities\OTPOptionEntity;
 use SSOfy\Models\Entities\UserEntity;
+use SSOfy\Laravel\Events\UserAuthenticated;
+use SSOfy\Laravel\Filters\Contracts\UserFilterInterface;
+use SSOfy\Laravel\Traits\Mask;
+use SSOfy\Laravel\Traits\Validation;
 
 class AuthController extends Controller
 {
