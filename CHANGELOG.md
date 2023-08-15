@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.4 - 2023-08-15
+
+* Validations fix.
+
 ## 2.0.3 - 2023-07-22
 
 * Hotfix: OTPRepository fixed.
