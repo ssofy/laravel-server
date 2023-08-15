@@ -67,26 +67,26 @@ trait Validation
      * @param Request $request
      * @return array
      */
-    public function validateScopeEntitiesRequest(Request $request)
+    public function validateScopeResourceRequest(Request $request)
     {
-        return $request->validate($this->scopeEntitiesRules(), $request->input());
+        return $request->validate($this->scopeResourceRules(), $request->input());
     }
 
     /**
      * @param Request $request
      * @return array
      */
-    public function validateClientEntityRequest(Request $request)
+    public function validateClientResourceRequest(Request $request)
     {
-        return $request->validate($this->clientEntityRules(), $request->input());
+        return $request->validate($this->clientResourceRules(), $request->input());
     }
 
     /**
      * @param Request $request
      * @return array
      */
-    public function validateUserEntityRequest(Request $request)
+    public function validateUserResourceRequest(Request $request)
     {
-        return $request->validate($this->userEntityRules(), $request->input());
+        return $request->validate($this->userResourceRules(), $request->input());
     }
 }

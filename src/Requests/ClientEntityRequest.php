@@ -16,6 +16,6 @@ class ClientEntityRequest extends FormRequest
 
     public function rules()
     {
-        return $this->clientEntityRules();
+        return $this->clientResourceRules();
     }
 }

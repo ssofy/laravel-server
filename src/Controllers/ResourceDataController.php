@@ -30,7 +30,7 @@ class ResourceDataController extends Controller
      */
     public function scopes(Request $request, ScopeRepositoryInterface $scopeRepository)
     {
-        $this->validateScopeEntitiesRequest($request);
+        $this->validateScopeResourceRequest($request);
 
         $lang = $request->input('lang');
 
@@ -44,7 +44,7 @@ class ResourceDataController extends Controller
      */
     public function client(Request $request, ClientRepositoryInterface $clientRepository)
     {
-        $this->validateClientEntityRequest($request);
+        $this->validateClientResourceRequest($request);
 
         $clientId = $request->input('id');
 
@@ -63,7 +63,7 @@ class ResourceDataController extends Controller
      */
     public function user(Request $request, UserRepositoryInterface $userRepository)
     {
-        $this->validateUserEntityRequest($request);
+        $this->validateUserResourceRequest($request);
 
         $scopes = $request->input('scopes');
 

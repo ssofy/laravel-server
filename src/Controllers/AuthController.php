@@ -17,7 +17,6 @@ use SSOfy\Laravel\Traits\Validation;
 class AuthController extends Controller
 {
     use Validation;
-    use Mask;
 
     /*
      ------------------------------------------------------------

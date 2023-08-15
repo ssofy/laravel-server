@@ -16,6 +16,6 @@ class UserEntityRequest extends FormRequest
 
     public function rules()
     {
-        return $this->userEntityRules();
+        return $this->userResourceRules();
     }
 }

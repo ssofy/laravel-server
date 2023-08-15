@@ -53,7 +53,7 @@ trait Rules
     protected function otpOptionsRules()
     {
         return [
-            'action'     => ['required', 'string', 'in:login,password_reset'],
+            'action'     => ['required', 'string', 'in:authentication,password_reset,password_renew'],
             'method'     => ['required', 'string', 'in:username,email,phone'],
             'identifier' => ['required', 'string'],
             'ip'         => ['nullable', 'ip'],
@@ -74,17 +74,17 @@ trait Rules
     /**
      * @return array
      */
-    public function scopeEntitiesRules()
+    public function scopeResourceRules()
     {
         return [
-            'lang' => ['nullable', 'string', 'max:2'],
+            'lang' => ['nullable', 'string', 'max:5'],
         ];
     }
 
     /**
      * @return array
      */
-    public function clientEntityRules()
+    public function clientResourceRules()
     {
         return [
             'id' => ['required', 'string', 'min:1'],
@@ -94,7 +94,7 @@ trait Rules
     /**
      * @return array
      */
-    public function userEntityRules()
+    public function userResourceRules()
     {
         return [
             'id'       => ['nullable', 'string'],

@@ -16,6 +16,6 @@ class ScopeEntitiesRequest extends FormRequest
 
     public function rules()
     {
-        return $this->scopeEntitiesRules();
+        return $this->scopeResourceRules();
     }
 }
