@@ -179,7 +179,7 @@ class EventController extends Controller
         /*
          * Send notification
          */
-        $settings = config('ssofy-server.otp.notification.settings');
+        $settings = config('ssofy-server.otp.notification.vars', config('ssofy-server.otp.notification.settings'));
         $channel  = config("ssofy-server.otp.notification.{$option->type}_channel");
 
         if (isset($channel)) {

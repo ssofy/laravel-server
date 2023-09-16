@@ -32,7 +32,7 @@ return [
             // 'nexmo' in older laravel versions
             'sms_chanel'    => env('SSOFY_OTP_SMS_CHANNEL', 'vonage'),
 
-            'settings' => [
+            'vars' => [
                 'brand' => env('APP_NAME'),
             ],
         ],
