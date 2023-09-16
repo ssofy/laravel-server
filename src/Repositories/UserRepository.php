@@ -78,7 +78,10 @@ class UserRepository implements UserRepositoryInterface
                               ->first();
 
         if (!is_null($link)) {
-            return $this->findById($link->user_id, $ip);
+            $found = $this->findById($link->user_id, $ip);
+            if (!is_null($found)) {
+                return $found;
+            }
         }
 
         $providerId = $user->id;
@@ -208,6 +211,10 @@ class UserRepository implements UserRepositoryInterface
 
         $passwordColumn = $this->getDBColumn('password');
 
+        if (is_null($password)) {
+            return $user->$passwordColumn === null;
+        }
+
         return $hasher->check($password, $user->$passwordColumn);
     }
 
@@ -248,8 +255,10 @@ class UserRepository implements UserRepositoryInterface
         $metadataColumn = $this->getDBColumn('metadata');
 
         if (!empty($metadataColumn)) {
-            if (isset($userAttributes['password'])) {
-                unset($userAttributes['password']);
+            $passwordColumn = $this->getDBColumn('password');
+
+            if (isset($userAttributes[$passwordColumn])) {
+                unset($userAttributes[$passwordColumn]);
             }
 
             $userModelCasts = $this->getModelCasts($userModel);

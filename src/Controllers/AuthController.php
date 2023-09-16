@@ -11,7 +11,6 @@ use SSOfy\Models\Entities\OTPOptionEntity;
 use SSOfy\Models\Entities\UserEntity;
 use SSOfy\Laravel\Events\UserAuthenticated;
 use SSOfy\Laravel\Filters\Contracts\UserFilterInterface;
-use SSOfy\Laravel\Traits\Mask;
 use SSOfy\Laravel\Traits\Validation;
 
 class AuthController extends Controller

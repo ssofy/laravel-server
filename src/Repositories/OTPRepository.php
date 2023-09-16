@@ -100,10 +100,13 @@ class OTPRepository implements OTPRepositoryInterface
         // mark user's email/phone as verified
 
         $option = $this->findById($optionId);
+        if (is_null($option)) {
+            return false;
+        }
 
         $user = $this->userRepository->findById($option->user_id, $ip);
         if (is_null($user)) {
-            return true;
+            return false;
         }
 
         if ($option->type === 'email' && !$user->email_verified) {

@@ -33,7 +33,13 @@ trait Validation
      */
     protected function validateTokenAuthRequest(Request $request)
     {
-        return $request->validate($this->tokenAuthRules(), $request->input());
+        $validated = $request->validate($this->tokenAuthRules(), $request->input());
+
+        if (!config('ssofy-server.authentication.methods.token', false)) {
+            abort(401, 'Unauthorized');
+        }
+
+        return $validated;
     }
 
     /**
@@ -42,7 +48,13 @@ trait Validation
      */
     protected function validateSocialAuthRequest(Request $request)
     {
-        return $request->validate($this->socialAuthRules(), $request->input());
+        $validated = $request->validate($this->socialAuthRules(), $request->input());
+
+        if (!config('ssofy-server.authentication.methods.social', false)) {
+            abort(401, 'Unauthorized');
+        }
+
+        return $validated;
     }
 
     /**
