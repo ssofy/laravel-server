@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.0.5 - 2023-09-16
+
+* Fixed OTP verification issue with non-exising otp option or user.
+* Fixed wrong column mapping in config file.
+* Config property rename `otp.notification.settings` to `otp.notification.vars` for compatibility with the new draft.
+
 ## 2.0.4 - 2023-08-15
 
 * Validations fix.
