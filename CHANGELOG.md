@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.6 - 2023-10-01
+
+* Renamed `settings` to `vars` in default otp templates while preserving the old functionality.
+
 ## 2.0.5 - 2023-09-16
 
 * Fixed OTP verification issue with non-exising otp option or user.
