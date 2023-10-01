@@ -189,7 +189,7 @@ class EventController extends Controller
                 app($notificationClass, [
                     'code'     => $code,
                     'via'      => [$channel],
-                    'settings' => $settings,
+                    'vars'     => $settings,
                 ])
             );
 

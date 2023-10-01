@@ -1,1 +1,1 @@
-{{ $code }} is your {{ $settings['brand'] }} verification code.
+{{ $code }} is your {{ $vars['brand'] }} verification code.

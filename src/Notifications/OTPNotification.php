@@ -15,13 +15,13 @@ class OTPNotification extends Notification implements ShouldQueue
 
     public $code;
     public $via;
-    public $settings;
+    public $vars;
 
-    public function __construct($code, $via, $settings)
+    public function __construct($code, $via, $vars)
     {
-        $this->code     = $code;
-        $this->via      = $via;
-        $this->settings = $settings;
+        $this->code = $code;
+        $this->via  = $via;
+        $this->vars = $vars;
     }
 
     public function via($notifiable)
@@ -35,7 +35,8 @@ class OTPNotification extends Notification implements ShouldQueue
             ->subject('Verification Code')
             ->view('vendor/ssofy/otp/email', [
                 'code'     => $this->code,
-                'settings' => $this->settings,
+                'vars'     => $this->vars,
+                'settings' => $this->vars,
             ]);
     }
 
@@ -54,7 +55,8 @@ class OTPNotification extends Notification implements ShouldQueue
         return trim(
             view('vendor/ssofy/otp/sms', [
                 'code'     => $this->code,
-                'settings' => $this->settings,
+                'vars'     => $this->vars,
+                'settings' => $this->vars,
             ])
         );
     }
