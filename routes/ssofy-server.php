@@ -13,7 +13,7 @@
 
 $router->group([
     'namespace'  => 'SSOfy\Laravel\Controllers',
-    'prefix'     => '/external/ssofy/',
+    'prefix'     => '/ssofy/',
     'middleware' => ['ssofy.signature', 'ssofy.response']
 ], function () use ($router) {
     $router->post('client', 'ResourceDataController@client');
