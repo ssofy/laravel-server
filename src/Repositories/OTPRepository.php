@@ -40,11 +40,11 @@ class OTPRepository implements OTPRepositoryInterface
 
         $options = [];
 
-        if (!is_null($user->email)) {
+        if (!is_null($user->email) && $this->methodIsEnabled('email')) {
             $options[] = $this->generateEmailOtpOption($action, $user);
         }
 
-        if (!is_null($user->phone)) {
+        if (!is_null($user->phone) && $this->methodIsEnabled('sms')) {
             $options[] = $this->generateSMSOtpOption($action, $user);
         }
 
@@ -144,5 +144,10 @@ class OTPRepository implements OTPRepositoryInterface
             'user_id' => $user->id,
             'action'  => $action,
         ]);
+    }
+
+    private function methodIsEnabled($method)
+    {
+        return in_array($method, config('ssofy-server.otp.methods'));
     }
 }

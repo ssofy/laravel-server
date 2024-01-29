@@ -24,6 +24,10 @@ return [
     */
     'otp' => [
         'store' => env('SSOFY_OTP_CACHE_DRIVER', 'file'),
+        'methods' => [
+            'email',
+            'sms'
+        ],
         'notification' => [
             'class'         => SSOfy\Laravel\Notifications\OTPNotification::class,
             'channels' => [
