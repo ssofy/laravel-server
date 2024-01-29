@@ -10,7 +10,7 @@ Read the full [documentation](https://www.ssofy.com/docs/SDK/LaravelServer/Insta
 ### Installing via Composer
 
 ```bash
-composer require ssofy/laravel-server:^2.0.0
+composer require ssofy/laravel-server:^2.1.0
 ```
 
 ## Support
