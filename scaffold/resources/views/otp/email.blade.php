@@ -126,7 +126,7 @@
                             </tr>
                             <tr>
                                 <td align="center" style="font-size:0px;padding:10px 25px;padding-right:25px;padding-left:25px;word-break:break-word;">
-                                    <div style="font-family:open Sans Helvetica, Arial, sans-serif;font-size:16px;line-height:1;text-align:center;color:#000000;">Please use the verification code below to continue the process:</div>
+                                    <div style="font-family:open Sans Helvetica, Arial, sans-serif;font-size:16px;line-height:1;text-align:center;color:#000000;">Here is your verification code for {{ Str::title(str_replace('_', ' ', $option->type)) }}:</div>
                                 </td>
                             </tr>
                             <tr>
