@@ -179,19 +179,22 @@ class EventController extends Controller
         /*
          * Send notification
          */
-        $settings = config('ssofy-server.otp.notification.vars', config('ssofy-server.otp.notification.settings'));
-        $channel  = config("ssofy-server.otp.notification.{$option->type}_channel");
+        $vars     = config('ssofy-server.otp.notification.vars', config('ssofy-server.otp.notification.settings'));
+        $channels = config("ssofy-server.otp.notification.channels");
 
-        if (isset($channel)) {
-            $notificationClass = config('ssofy-server.otp.notification.class');
+        $notificationClass = config('ssofy-server.otp.notification.class');
 
-            Notification::route($channel, $option->to)->notify(
-                app($notificationClass, [
-                    'code'     => $code,
-                    'via'      => [$channel],
-                    'vars'     => $settings,
-                ])
-            );
+        if (isset($channels[$option->type])) {
+            $channel = $channels[$option->type];
+            Notification::route($channel, $option->to)
+                        ->notify(
+                            app($notificationClass, [
+                                'option'   => $option,
+                                'vars'     => $vars,
+                                'code'     => $code,
+                                'channels' => [$channel],
+                            ])
+                        );
 
             event(new OTPSent($option));
         }

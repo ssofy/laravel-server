@@ -18,21 +18,19 @@ return [
     | Specify the cache driver to be used as temporary token storage, including
     | Action, OTP, and Auth tokens.
     |
-    | Also, specify the Email and SMS channels to use when the user requests a
-    | new OTP.
+    | Also, specify the Email and SMS channels to use when user requests a new
+    | OTP.
     |
     */
-    'otp'            => [
-        'store'        => env('SSOFY_OTP_CACHE_DRIVER', 'file'),
+    'otp' => [
+        'store' => env('SSOFY_OTP_CACHE_DRIVER', 'file'),
         'notification' => [
-            'class' => SSOfy\Laravel\Notifications\OTPNotification::class,
-
-            'email_channel' => env('SSOFY_OTP_EMAIL_CHANNEL', 'mail'),
-
-            // 'nexmo' in older laravel versions
-            'sms_chanel'    => env('SSOFY_OTP_SMS_CHANNEL', 'vonage'),
-
-            'vars' => [
+            'class'         => SSOfy\Laravel\Notifications\OTPNotification::class,
+            'channels' => [
+                'email' => env('SSOFY_OTP_EMAIL_CHANNEL', 'mail'),
+                'sms'   => env('SSOFY_OTP_SMS_CHANNEL', 'vonage'), // 'nexmo' in older laravel versions
+            ],
+            'vars'  => [
                 'brand' => env('APP_NAME'),
             ],
         ],
@@ -68,7 +66,7 @@ return [
     | from/to database or authentication providers.
     |
     */
-    'repository'     => [
+    'repository' => [
         'client' => \SSOfy\Laravel\Repositories\ClientRepository::class,
         'scope'  => \SSOfy\Laravel\Repositories\ScopeRepository::class,
         'user'   => \SSOfy\Laravel\Repositories\UserRepository::class,
@@ -80,20 +78,19 @@ return [
     | User Data Settings
     |--------------------------------------------------------------------------
     */
-    'user'           => [
+    'user' => [
         'model' => \App\Models\User::class,
 
-        'filter'  => \SSOfy\Laravel\Filters\UserFilter::class,
+        'filter' => \SSOfy\Laravel\Filters\UserFilter::class,
 
         /**
          * Specify the actual column name for each of the user claims.
          * Set to null if no column exists in the database for the claim.
-         *
          * "[CLAIM]" => "[COLUMN]"
          */
         'columns' => [
-            'id'             => 'id',
-            'hash'           => 'id',
+            'id'             => 'id', // required
+            'hash'           => 'id', // required
             'name'           => 'name',
             'display_name'   => 'name',
             'picture'        => 'avatar_url',
@@ -112,7 +109,7 @@ return [
     | Static Data
     |--------------------------------------------------------------------------
     |
-    | Default repositories generate a predefined set of scopes and clients,
+    | Default repositories respond with a predefined set of scopes and clients,
     | as specified below.
     |
     | For more complicated scenarios (e.g. read from database), you may need to
@@ -122,26 +119,28 @@ return [
     | Read more in docs: https://www.ssofy.com/docs/SDK/LaravelServer/Repositories
     |
     */
-    'data'           => [
-        'scopes'  => [
-            '*' => [
+    'data' => [
+        'scopes' => array(
+            [
+                'id'          => '*',
                 'title'       => 'Read and Write all data.',
                 'description' => null,
                 'icon'        => 'fa-user-shield', // https://fontawesome.com
                 'url'         => null,
             ]
-        ],
-        'clients' => [
-            'test' => [
+        ),
+        'clients' => array(
+            [
+                'id'             => 'my_app_id', // required
                 'name'           => 'My App Name', // required
-                'secret'         => 'CLIENT SECRET KEY',
-                'redirect_uris'  => ['*'], // wildcard is supported but not recommended.
+                'secret'         => 'SOME_SECRET', // required for `confidential` clients
+                'redirect_uris'  => ['*'], // wildcard is supported but not recommended for production env.
                 'icon'           => null,
                 'theme'          => 'default',
                 'tos'            => 'https://...',
                 'privacy_policy' => 'https://...',
                 'confidential'   => false, // https://oauth.net/2/client-types
             ]
-        ],
+        ),
     ],
 ];

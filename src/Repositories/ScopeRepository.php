@@ -14,12 +14,12 @@ class ScopeRepository implements ScopeRepositoryInterface
     {
         $result = [];
 
-        $data = config('ssofy-server.data.scopes');
-        foreach ($data as $id => $properties) {
-            $scope        = new ScopeEntity($properties);
-            $scope->id    = strval($id);
-            $scope->title = __($scope->title, [], $lang);
-            $result[]     = $scope;
+        $scopes = config('ssofy-server.data.scopes');
+        foreach ($scopes as $key => $attributes) {
+            $attributes['id']    = isset($attributes['id']) ? $attributes['id'] : strval($key);
+            $attributes['title'] = __($attributes['title'], [], $lang);
+
+            $result[] = new ScopeEntity($attributes);
         }
 
         return $result;

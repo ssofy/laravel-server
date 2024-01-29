@@ -12,15 +12,22 @@ class ClientRepository implements ClientRepositoryInterface
      */
     public function findById($id)
     {
-        $data = config('ssofy-server.data.clients');
+        $clients = config('ssofy-server.data.clients');
 
-        if (!isset($data[$id])) {
+        $client = null;
+        foreach ($clients as $key => $attributes) {
+            $key = isset($attributes['id']) ? $attributes['id'] : strval($key);
+            if ($key === $id) {
+                $client       = $attributes;
+                $client['id'] = $key;
+                break;
+            }
+        }
+
+        if (is_null($client)) {
             return null;
         }
 
-        $result     = new ClientEntity($data[$id]);
-        $result->id = strval($id);
-
-        return $result;
+        return new ClientEntity($client);
     }
 }
