@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.1.0 - 2024-01-29
+
+* Added config for otp options' enabled methods.
+* Updated Blade views. OTP Action included.
+* Config file revamp with compatibility.
+
 ## 2.0.6 - 2023-10-01
 
 * Renamed `settings` to `vars` in default otp templates while preserving the old functionality.
