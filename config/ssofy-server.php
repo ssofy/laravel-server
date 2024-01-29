@@ -46,12 +46,12 @@ return [
     */
     'authentication' => [
         'methods'      => [
-            'username' => true,
-            'email'    => true,
-            'phone'    => true,
-            'token'    => true,
-            'otp'      => true,
-            'social'   => true,
+            'username',
+            'email',
+            'phone',
+            'token',
+            'otp',
+            'social',
         ],
         'passwordless' => true,
     ],

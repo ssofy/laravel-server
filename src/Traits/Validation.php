@@ -16,7 +16,9 @@ trait Validation
     {
         $validated = $request->validate($this->passwordAuthRules(), $request->input());
 
-        if (!config('ssofy-server.authentication.methods.' . $validated['method'], false)) {
+        if (!in_array($validated['method'], config('ssofy-server.authentication.methods'))
+            && !config('ssofy-server.authentication.methods.' . $validated['method'], false)
+        ) {
             abort(401, 'Unauthorized');
         }
 
@@ -35,7 +37,9 @@ trait Validation
     {
         $validated = $request->validate($this->tokenAuthRules(), $request->input());
 
-        if (!config('ssofy-server.authentication.methods.token', false)) {
+        if (!in_array('token', config('ssofy-server.authentication.methods'))
+            && !config('ssofy-server.authentication.methods.token', false)
+        ) {
             abort(401, 'Unauthorized');
         }
 
@@ -50,7 +54,9 @@ trait Validation
     {
         $validated = $request->validate($this->socialAuthRules(), $request->input());
 
-        if (!config('ssofy-server.authentication.methods.social', false)) {
+        if (!in_array('social', config('ssofy-server.authentication.methods'))
+            && !config('ssofy-server.authentication.methods.social', false)
+        ) {
             abort(401, 'Unauthorized');
         }
 
