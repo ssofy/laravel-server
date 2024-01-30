@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.1.1 - 2024-01-30
+
+* Fixed the message in blade view.
+
 ## 2.1.0 - 2024-01-29
 
 * Added config for otp options' enabled methods.
