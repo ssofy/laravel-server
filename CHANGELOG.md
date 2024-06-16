@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.1.2 - 2024-06-16
+
+* Alignments with latest php-sdk `UserRepositoryInterface::find()` signature updates.
+* Implemented `UserRepository::findAll()`.
+* Removed user caching in UserRepository.
+* Enhanced validation rules by taking advantages of php-sdk model validation.
+* Added `/users` endpoint.
+
 ## 2.1.1 - 2024-01-30
 
 * Fixed the message in blade view.
