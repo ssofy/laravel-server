@@ -3,10 +3,16 @@
 namespace SSOfy\Laravel\Repositories;
 
 use Illuminate\Hashing\BcryptHasher;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use ReflectionClass;
+use SSOfy\Enums\FilterOperator;
+use SSOfy\Enums\SortOrder;
 use SSOfy\Helper;
+use SSOfy\Models\Filter;
+use SSOfy\Models\PaginatedResponse;
+use SSOfy\Models\Sort;
 use SSOfy\Repositories\UserRepositoryInterface;
 use SSOfy\Models\Entities\TokenEntity;
 use SSOfy\Laravel\Models\UserSocialLink;
@@ -24,11 +30,6 @@ class UserRepository implements UserRepositoryInterface
      * @var UserTransformer
      */
     private $userTransformer;
-
-    /**
-     * @var array
-     */
-    private $index = [];
 
     public function __construct(UserTokenManager $otp, UserTransformer $userTransformer)
     {
@@ -69,6 +70,50 @@ class UserRepository implements UserRepositoryInterface
     /**
      * @inheritDoc
      */
+    public function find($filters, $ip = null)
+    {
+        $users = $this->findAll($filters, [], 1, $ip);
+        if (empty($users)) {
+            return null;
+        }
+
+        return $users[0];
+    }
+
+    public function findAll($filters = [], $sorts = [], $count = 10, $page = 1, $ip = null)
+    {
+        $model = $this->getUserModel();
+        $query = $model::query();
+
+        foreach ($filters as $filter) {
+            $query = $this->setFilterCriteria($query, $filter);
+        }
+
+        foreach ($sorts as $sort) {
+            $query = $this->setSortCriteria($query, $sort);
+        }
+
+        /** @var LengthAwarePaginator $result */
+        $result     = $query->paginate($count);
+        $resultData = $result
+            ->getCollection()
+            ->transform(function ($user) {
+                return $this->userTransformer->transform($user);
+            })
+            ->toArray();
+
+        return new PaginatedResponse([
+            'data'        => $resultData,
+            'page'        => intval($result->currentPage()),
+            'page_size'   => intval($result->perPage()),
+            'total_pages' => intval($result->lastPage()),
+            'total_count' => intval($result->total()),
+        ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function findBySocialLinkOrCreate($provider, $user, $ip = null)
     {
         // the user entity holds the id provided by the provider
@@ -100,29 +145,13 @@ class UserRepository implements UserRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function find($field, $value, $ip = null)
-    {
-        $user = $this->cache([$field => $value], function () use ($field, $value) {
-            $model = $this->getUserModel();
-
-            $column = $this->getDBColumn($field);
-
-            return $model::where($column, $value)->first();
-        });
-
-        if (is_null($user)) {
-            return null;
-        }
-
-        return $this->userTransformer->transform($user);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function findByEmailOrCreate($user, $password = null, $ip = null)
     {
-        $existingUser = $this->find('email', $user->email, $ip);
+        $filter = new Filter([
+            'email' => $user->email,
+        ]);
+
+        $existingUser = $this->find([$filter], $ip);
         if (!is_null($existingUser)) {
             return $existingUser;
         }
@@ -141,7 +170,7 @@ class UserRepository implements UserRepositoryInterface
     {
         $model = $this->getUserModel();
 
-        $userAttributes = $user->toArray();
+        $userAttributes = $user->toArray(false);
 
         if (isset($userAttributes['id'])) {
             unset($userAttributes['id']);
@@ -152,6 +181,7 @@ class UserRepository implements UserRepositoryInterface
         }
 
         $userAttributes['password'] = Hash::make($password);
+        $userAttributes['created']  = true;
 
         $userModel = new $model;
 
@@ -163,6 +193,11 @@ class UserRepository implements UserRepositoryInterface
      */
     public function update($user, $ip = null)
     {
+        if (is_null($user->hash)) {
+            // to avoid mandatory field error on "hash" attribute.
+            $user->hash = $user->id;
+        }
+
         $userAttributes = $user->toArray();
 
         $model = $this->getUserModel();
@@ -274,31 +309,6 @@ class UserRepository implements UserRepositoryInterface
         return $this->userTransformer->transform($userModel);
     }
 
-    protected function cache($criteria, $callback)
-    {
-        foreach ($criteria as $field => $value) {
-            $key = "$field:$value";
-
-            if (isset($this->index[$key])) {
-                return $this->index[$key];
-            }
-        }
-
-        $user = $callback();
-        if (is_null($user)) {
-            return null;
-        }
-
-        foreach (['id', 'email', 'phone'] as $field) {
-            $column = $this->getDBColumn($field);
-            if (isset($user->$column)) {
-                $this->index["$field:{$user->$column}"] = $user;
-            }
-        }
-
-        return $user;
-    }
-
     protected function getDBColumn($claim)
     {
         return config("ssofy-server.user.columns.{$claim}");
@@ -315,5 +325,74 @@ class UserRepository implements UserRepositoryInterface
         $castsProperty = $reflection->getProperty('casts');
         $castsProperty->setAccessible(true);
         return $castsProperty->getValue($model);
+    }
+
+    /**
+     * @param Filter $filter
+     */
+    private function setFilterCriteria($query, $filter)
+    {
+        if (is_array($filter)) {
+            $query->where(function ($query) use ($filter) {
+                foreach ($filter as $subFilter) {
+                    $this->setFilterCriteria($query, $subFilter);
+                }
+            });
+            return $query;
+        }
+
+        $claim    = $filter->key;
+        $operator = $filter->operator;
+        $value    = $filter->value;
+
+        $column = $this->getDBColumn($claim);
+        if (is_null($column)) {
+            return $query;
+        }
+
+        switch ($operator) {
+            case FilterOperator::EQUALS:
+                return $query->where($column, $value);
+            case FilterOperator::NOT_EQUALS:
+                return $query->where($column, '<>', $value);
+            case FilterOperator::GREATER_THAN:
+                return $query->where($column, '>', $value);
+            case FilterOperator::GREATER_THAN_OR_EQUAL_TO:
+                return $query->where($column, '>=', $value);
+            case FilterOperator::LESS_THAN:
+                return $query->where($column, '<', $value);
+            case FilterOperator::LESS_THAN_OR_EQUAL_TO:
+                return $query->where($column, '<=', $value);
+            case FilterOperator::CONTAINS:
+                return $query->where($column, 'LIKE', "%$value%");
+            case FilterOperator::STARTS_WITH:
+                return $query->where($column, 'LIKE', "$value%");
+            case FilterOperator::ENDS_WITH:
+                return $query->where($column, 'LIKE', "%$value");
+        }
+
+        return $query;
+    }
+
+    /**
+     * @param Sort $sort
+     */
+    private function setSortCriteria($query, $sort)
+    {
+        $claim = $sort->key;
+
+        $column = $this->getDBColumn($claim);
+        if (is_null($column)) {
+            return $query;
+        }
+
+        switch ($sort->order) {
+            case SortOrder::ASCENDING:
+                return $query->orderBy($column, 'asc');
+            case SortOrder::DESCENDING:
+                return $query->orderBy($column, 'desc');
+        }
+
+        return $query;
     }
 }

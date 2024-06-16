@@ -11,7 +11,7 @@ use SSOfy\Repositories\UserRepositoryInterface;
 use SSOfy\Models\Entities\OTPOptionEntity;
 use SSOfy\Models\Entities\UserEntity;
 use SSOfy\Laravel\Traits\Validation;
-use SSOfy\Laravel\Rules\OTPVerification;
+use SSOfy\Laravel\Rules\OTPVerificationValidation;
 use SSOfy\Laravel\Events\OTPSent;
 use SSOfy\Laravel\Events\SafetyReset;
 use SSOfy\Laravel\Events\TokenDeleted;
@@ -85,7 +85,7 @@ class EventController extends Controller
                  */
                 $validatorFactory = app('Illuminate\Validation\Factory');
                 $validatorFactory->make($payload, [
-                    'token'    => ['bail', 'required', 'string', 'min:1', OTPVerification::make()],
+                    'token'    => ['bail', 'required', 'string', 'min:1', OTPVerificationValidation::make()],
                     'password' => ['bail', 'required', 'string', 'min:1'],
                     'ip'       => ['bail', 'nullable', 'ip'],
                 ])->validate();
@@ -231,8 +231,6 @@ class EventController extends Controller
      */
     protected function userUpdated($payload, UserRepositoryInterface $userRepository)
     {
-        $payload['user']['hash'] = $payload['user']['id'];
-
         $ip = Arr::get($payload, 'ip');
 
         /** @var UserEntity $user */

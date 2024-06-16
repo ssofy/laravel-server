@@ -107,4 +107,13 @@ trait Validation
     {
         return $request->validate($this->userResourceRules(), $request->input());
     }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function validateUsersResourceRequest(Request $request)
+    {
+        return $request->validate($this->usersResourceRules(), $request->input());
+    }
 }

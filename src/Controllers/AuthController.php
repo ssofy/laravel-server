@@ -4,6 +4,7 @@ namespace SSOfy\Laravel\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use SSOfy\Models\Filter;
 use SSOfy\Repositories\OTPRepositoryInterface;
 use SSOfy\Repositories\UserRepositoryInterface;
 use SSOfy\Models\Entities\AuthResponseEntity;
@@ -108,7 +109,6 @@ class AuthController extends Controller
         $validated = $this->validateSocialAuthRequest($request);
 
         try {
-            $validated['user']['hash'] = '0';
             $user = new UserEntity($validated['user']);
         } catch (\SSOfy\Exceptions\Exception $exception) {
             abort(400, 'Bad Request');
@@ -145,8 +145,12 @@ class AuthController extends Controller
         $identifier = $request->input('identifier');
         $ip         = $request->input('ip');
 
-        $user = $userRepository->find($method, $identifier, $ip);
+        $filter = new Filter([
+            'key' => $method,
+            'value' => $identifier,
+        ]);
 
+        $user = $userRepository->find([$filter], $ip);
         if (is_null($user)) {
             abort(401, 'Unauthorized');
         }
@@ -191,7 +195,12 @@ class AuthController extends Controller
         $ip,
         UserRepositoryInterface $userRepository
     ) {
-        $user = $userRepository->find($method, $identifier, $ip);
+        $filter = new Filter([
+            'key' => $method,
+            'value' => $identifier,
+        ]);
+
+        $user = $userRepository->find([$filter], $ip);
         if (is_null($user)) {
             return false;
         }

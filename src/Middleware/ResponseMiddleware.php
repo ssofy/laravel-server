@@ -63,11 +63,10 @@ class ResponseMiddleware
 
     private function rewrite($original)
     {
-        if (!is_a($original, BaseModel::class)) {
-            return $original;
-            // throw new Exception(sprintf('Expected %s but got %s', BaseModel::class, gettype($original)));
+        if (is_a($original, BaseModel::class)) {
+            return $original->toArray();
         }
 
-        return $original->toArray();
+        return $original;
     }
 }

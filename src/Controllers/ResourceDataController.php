@@ -4,6 +4,8 @@ namespace SSOfy\Laravel\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use SSOfy\Models\Filter;
+use SSOfy\Models\Sort;
 use SSOfy\Repositories\ClientRepositoryInterface;
 use SSOfy\Repositories\ScopeRepositoryInterface;
 use SSOfy\Repositories\UserRepositoryInterface;
@@ -67,26 +69,70 @@ class ResourceDataController extends Controller
 
         $scopes = $request->input('scopes');
 
-        foreach ([
-            'id',
-            'username',
-            'email',
-            'phone',
-        ] as $field) {
-            if ($request->has($field)) {
-                $user = $userRepository->find($field, $request->input($field));
-
-                if (is_null($user)) {
-                    abort(204, 'Not Found');
-                }
-
-                /** @var UserFilterInterface $filter */
-                $filter = app(config('ssofy-server.user.filter'));
-
-                return $filter->filter($user, $scopes);
+        foreach (
+            [
+                'id',
+                'username',
+                'email',
+                'phone',
+            ] as $field
+        ) {
+            if (!$request->has($field)) {
+                continue;
             }
+
+            $filter = new Filter([
+                'key' => $field,
+                'value' => $request->input($field),
+            ]);
+
+            $user = $userRepository->find([$filter]);
+
+            if (is_null($user)) {
+                abort(204, 'Not Found');
+            }
+
+            /** @var UserFilterInterface $filter */
+            $filter = app(config('ssofy-server.user.filter'));
+
+            return $filter->filter($user, $scopes);
         }
 
         abort(204, "Not Found");
+    }
+
+    public function users(Request $request, UserRepositoryInterface $userRepository)
+    {
+        $this->validateUsersResourceRequest($request);
+
+        $filters = $request->input('filters', []);
+        $sorts   = $request->input('sorts', []);
+        $count   = $request->input('count', 25);
+        $ip      = $request->input('ip');
+
+        $filters = $this->transformFilters($filters);
+        $sorts   = $this->transformSorts($sorts);
+
+        return $userRepository->findAll($filters, $sorts, $count, $ip);
+    }
+
+    protected function transformFilters($filters)
+    {
+        $result = [];
+        foreach ($filters as $filter) {
+            if (isset($filter['key'])) {
+                $result[] = new Filter($filter);
+            } elseif (is_array($filter)) {
+                $result[] = $this->transformFilters($filter);
+            }
+        }
+        return $result;
+    }
+
+    protected function transformSorts($sorts)
+    {
+        return array_map(function ($sort) {
+            return new Sort($sort);
+        }, $sorts);
     }
 }

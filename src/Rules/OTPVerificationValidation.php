@@ -5,7 +5,7 @@ namespace SSOfy\Laravel\Rules;
 use Illuminate\Contracts\Validation\Rule;
 use SSOfy\Laravel\UserTokenManager;
 
-class OTPVerification implements Rule
+class OTPVerificationValidation implements Rule
 {
     /**
      * @var UserTokenManager
@@ -32,11 +32,11 @@ class OTPVerification implements Rule
     /**
      * @param null|string $group
      * @param bool $forget
-     * @return OTPVerification
+     * @return self
      */
     public static function make($group = null, $forget = false)
     {
-        return app(self::class, [
+        return app(static::class, [
             'group'  => $group,
             'forget' => $forget,
         ]);

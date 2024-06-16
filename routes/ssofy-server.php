@@ -21,6 +21,7 @@ $router->group([
     $router->post('scopes', 'ResourceDataController@scopes');
 
     $router->post('user', 'ResourceDataController@user');
+    $router->post('users', 'ResourceDataController@users');
 
     $router->post('otp-options', 'AuthController@otpOptions');
 

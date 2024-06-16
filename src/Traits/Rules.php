@@ -2,6 +2,10 @@
 
 namespace SSOfy\Laravel\Traits;
 
+use SSOfy\Laravel\Rules\UserEntityValidation;
+use SSOfy\Laravel\Rules\UserFiltersValidation;
+use SSOfy\Laravel\Rules\UserSortsValidation;
+
 trait Rules
 {
     /**
@@ -35,15 +39,9 @@ trait Rules
     protected function socialAuthRules()
     {
         return [
-            'provider'            => ['required', 'string'],
-            'user.id'             => ['required', 'string', 'min:1'],
-            'user.email'          => ['required', 'email'],
-            'user.email_verified' => ['nullable', 'boolean'],
-            'user.name'           => ['nullable', 'string'],
-            'user.given_name'     => ['nullable', 'string'],
-            'user.family_name'    => ['nullable', 'string'],
-            'user.picture'        => ['nullable', 'url'],
-            'ip'                  => ['nullable', 'ip'],
+            'user'     => [UserEntityValidation::make(true)],
+            'provider' => ['required', 'string'],
+            'ip'       => ['nullable', 'ip'],
         ];
     }
 
@@ -103,6 +101,23 @@ trait Rules
             'phone'    => ['nullable', 'string'],
             'scopes'   => ['nullable', 'array'],
             'scopes.*' => ['string'],
+            'ip'       => ['nullable', 'ip'],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function usersResourceRules()
+    {
+        return [
+            'filters'   => ['nullable', 'array'],
+            'filters.*' => ['array', UserFiltersValidation::make()],
+            'sorts'     => ['nullable', 'array'],
+            'sorts.*'   => ['array', UserSortsValidation::make()],
+            'page'      => ['nullable', 'integer', 'min:1'],
+            'count'     => ['nullable', 'integer', 'min:1', 'max:100'],
+            'ip'        => ['nullable', 'ip'],
         ];
     }
 }
