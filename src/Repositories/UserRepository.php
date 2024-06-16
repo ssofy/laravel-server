@@ -72,12 +72,19 @@ class UserRepository implements UserRepositoryInterface
      */
     public function find($filters, $ip = null)
     {
-        $users = $this->findAll($filters, [], 1, $ip);
-        if (empty($users)) {
+        $model = $this->getUserModel();
+        $query = $model::query();
+
+        foreach ($filters as $filter) {
+            $query = $this->setFilterCriteria($query, $filter);
+        }
+
+        $user = $query->first();
+        if (is_null($user)) {
             return null;
         }
 
-        return $users[0];
+        return $this->userTransformer->transform($user);
     }
 
     public function findAll($filters = [], $sorts = [], $count = 10, $page = 1, $ip = null)
