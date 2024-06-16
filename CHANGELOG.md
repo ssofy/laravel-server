@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.1.3 - 2024-06-16
+
+* Fixed the bug with UserRepository::find().
+
 ## 2.1.2 - 2024-06-16
 
 * Alignments with latest php-sdk `UserRepositoryInterface::find()` signature updates.
