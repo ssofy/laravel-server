@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.1.4 - 2024-06-17
+
+* Fixed the PaginatedResponseEntity import.
+
 ## 2.1.3 - 2024-06-16
 
 * Fixed the bug with UserRepository::find().
