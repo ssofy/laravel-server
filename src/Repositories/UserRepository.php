@@ -6,18 +6,18 @@ use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
-use ReflectionClass;
 use SSOfy\Enums\FilterOperator;
 use SSOfy\Enums\SortOrder;
 use SSOfy\Helper;
 use SSOfy\Models\Filter;
-use SSOfy\Models\PaginatedResponse;
 use SSOfy\Models\Sort;
-use SSOfy\Repositories\UserRepositoryInterface;
+use SSOfy\Models\Entities\PaginatedResponseEntity;
 use SSOfy\Models\Entities\TokenEntity;
+use SSOfy\Repositories\UserRepositoryInterface;
 use SSOfy\Laravel\Models\UserSocialLink;
 use SSOfy\Laravel\UserTokenManager;
 use SSOfy\Laravel\Transformers\UserTransformer;
+use ReflectionClass;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -109,7 +109,7 @@ class UserRepository implements UserRepositoryInterface
             })
             ->toArray();
 
-        return new PaginatedResponse([
+        return new PaginatedResponseEntity([
             'data'        => $resultData,
             'page'        => intval($result->currentPage()),
             'page_size'   => intval($result->perPage()),
