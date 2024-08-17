@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.1.5 - 2024-08-17
+
+* Fixed the Social Auth issue.
+
 ## 2.1.4 - 2024-06-17
 
 * Fixed the PaginatedResponseEntity import.
