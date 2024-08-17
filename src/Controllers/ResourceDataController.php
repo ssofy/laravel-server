@@ -82,7 +82,7 @@ class ResourceDataController extends Controller
             }
 
             $filter = new Filter([
-                'key' => $field,
+                'key'   => $field,
                 'value' => $request->input($field),
             ]);
 

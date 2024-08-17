@@ -30,7 +30,7 @@ class UserFiltersValidation extends FilterValidation
 
         if (isset($filterData['operator']) && $filterData['operator'] === FilterOperator::IN) {
             foreach ($filterData['value'] as $value) {
-                $subFilterData = $filterData;
+                $subFilterData          = $filterData;
                 $subFilterData['value'] = $value;
                 if (!$this->userEntityValidation->passes($attribute, $subFilterData)) {
                     $this->message = $this->userEntityValidation->message();

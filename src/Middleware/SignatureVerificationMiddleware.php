@@ -27,7 +27,7 @@ class SignatureVerificationMiddleware
         $secret = config('ssofy-server.secret');
 
         $signatureGenerator = new SignatureGenerator();
-        $validator = new SignatureVerifier($signatureGenerator);
+        $validator          = new SignatureVerifier($signatureGenerator);
 
         if (false === $validator->verifyBase64Signature($path, $params, $secret, $signature)) {
             return response('', 400);

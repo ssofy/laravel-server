@@ -28,9 +28,9 @@ class AuthController extends Controller
      * @return AuthResponseEntity
      */
     public function passwordAuth(
-        Request                 $request,
+        Request $request,
         UserRepositoryInterface $userRepository,
-        OTPRepositoryInterface  $otpRepository
+        OTPRepositoryInterface $otpRepository
     ) {
         $this->validatePasswordAuthRequest($request);
 
@@ -134,9 +134,9 @@ class AuthController extends Controller
      * @return OTPOptionEntity[]
      */
     public function otpOptions(
-        Request                 $request,
+        Request $request,
         UserRepositoryInterface $userRepository,
-        OTPRepositoryInterface  $otpRepository
+        OTPRepositoryInterface $otpRepository
     ) {
         $this->validateOTPOptionsRequest($request);
 
@@ -146,7 +146,7 @@ class AuthController extends Controller
         $ip         = $request->input('ip');
 
         $filter = new Filter([
-            'key' => $method,
+            'key'   => $method,
             'value' => $identifier,
         ]);
 
@@ -169,7 +169,7 @@ class AuthController extends Controller
         $optionId,
         $code,
         $ip,
-        OTPRepositoryInterface  $otpRepository,
+        OTPRepositoryInterface $otpRepository,
         UserRepositoryInterface $userRepository
     ) {
         if (!$otpRepository->verify($optionId, $code, $ip)) {
@@ -196,7 +196,7 @@ class AuthController extends Controller
         UserRepositoryInterface $userRepository
     ) {
         $filter = new Filter([
-            'key' => $method,
+            'key'   => $method,
             'value' => $identifier,
         ]);
 

@@ -40,9 +40,11 @@ class UserEntityValidation implements Rule
     public function passes($attribute, $value)
     {
         try {
-            $userEntity = new UserEntity([
-                $value['key'] => isset($value['value']) ? $value['value'] : null,
-            ]);
+            $userAttributes = isset($value) && is_array($value) ? $value : [];
+
+            $userAttributes['hash'] = '';
+
+            $userEntity = new UserEntity($userAttributes);
 
             $userEntity->toArray($this->requiredFieldsCheck); // Triggers validation in the UserEntity class
             return true;

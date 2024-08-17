@@ -138,15 +138,15 @@ class UserRepository implements UserRepositoryInterface
 
         $providerId = $user->id;
 
-        $created = $this->findByEmailOrCreate($user, null, $ip);
+        $userEntity = $this->findByEmailOrCreate($user, null, $ip);
 
         UserSocialLink::create([
             'provider'    => $provider,
             'provider_id' => $providerId,
-            'user_id'     => $created->id,
+            'user_id'     => $userEntity->id,
         ]);
 
-        return $created;
+        return $userEntity;
     }
 
     /**
@@ -155,7 +155,8 @@ class UserRepository implements UserRepositoryInterface
     public function findByEmailOrCreate($user, $password = null, $ip = null)
     {
         $filter = new Filter([
-            'email' => $user->email,
+            'key'   => 'email',
+            'value' => $user->email,
         ]);
 
         $existingUser = $this->find([$filter], $ip);
@@ -188,11 +189,13 @@ class UserRepository implements UserRepositoryInterface
         }
 
         $userAttributes['password'] = Hash::make($password);
-        $userAttributes['created']  = true;
 
         $userModel = new $model;
 
-        return $this->storeUser($userAttributes, $userModel);
+        $userEntity = $this->storeUser($userAttributes, $userModel);
+
+        $userEntity->created = true;
+        return $userEntity;
     }
 
     /**
@@ -312,6 +315,7 @@ class UserRepository implements UserRepositoryInterface
         }
 
         $userModel->save();
+        $userModel->refresh();
 
         return $this->userTransformer->transform($userModel);
     }
